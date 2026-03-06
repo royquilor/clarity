@@ -13,6 +13,7 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 import {
   Avatar,
   AvatarFallback,
@@ -251,6 +252,30 @@ export function ClaritySprint() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Step dots — top left, outside keyed QuestionView so they animate per-dot */}
+      {appState === "questions" && (
+        <div className="px-6 pt-5">
+          <div className="flex items-center gap-1" aria-label={`Step ${currentStep + 1} of ${QUESTIONS.length}`}>
+            {QUESTIONS.map((q, i) => {
+              const isAnswered = !!answers[q.id]?.trim()
+              const isCurrent = i === currentStep
+              return (
+                <motion.div
+                  key={i}
+                  className="rounded-full bg-foreground"
+                  animate={{
+                    width: isCurrent ? 12 : 6,
+                    height: 6,
+                    opacity: isCurrent ? 1 : isAnswered ? 0.5 : 0.15,
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Main */}
       <div className="flex-1 flex flex-col">
         {appState === "questions" && (
@@ -262,9 +287,7 @@ export function ClaritySprint() {
             section={QUESTIONS[currentStep].section}
             suggestions={QUESTIONS[currentStep].suggestions}
             step={currentStep}
-            total={QUESTIONS.length}
             answer={answers[QUESTIONS[currentStep].id] ?? ""}
-            answers={answers}
             onChange={(val) =>
               setAnswers((prev) => ({ ...prev, [QUESTIONS[currentStep].id]: val }))
             }
@@ -382,9 +405,7 @@ type QuestionViewProps = {
   section: string
   suggestions: readonly [string, string]
   step: number
-  total: number
   answer: string
-  answers: Record<string, string>
   onChange: (value: string) => void
   onNext: () => void
   onBack: () => void
@@ -399,9 +420,7 @@ function QuestionView({
   sources,
   suggestions,
   step,
-  total,
   answer,
-  answers,
   onChange,
   onNext,
   onBack,
@@ -428,32 +447,19 @@ function QuestionView({
     el.style.height = `${el.scrollHeight}px`
   }
 
+  React.useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && answer.trim()) {
+        e.preventDefault()
+        onNext()
+      }
+    }
+    window.addEventListener("keydown", handleGlobalKeyDown)
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown)
+  }, [answer, onNext])
+
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
-      {/* Step dots — top left */}
-      <div className="px-6 pt-5">
-        <div className="flex items-center gap-1" aria-label={`Step ${step + 1} of ${total}`}>
-          {Array.from({ length: total }).map((_, i) => {
-            const q = QUESTIONS[i]
-            const isAnswered = !!answers[q.id]?.trim()
-            const isCurrent = i === step
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-full transition-all duration-300",
-                  isCurrent
-                    ? "w-3 h-1.5 bg-foreground"
-                    : isAnswered
-                    ? "w-1.5 h-1.5 bg-foreground/50"
-                    : "w-1.5 h-1.5 bg-foreground/15",
-                )}
-              />
-            )
-          })}
-        </div>
-      </div>
-
       {/* Question + options area */}
       <div className="flex-1 flex flex-col justify-center px-6 pb-24">
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
