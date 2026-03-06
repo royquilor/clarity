@@ -13,12 +13,22 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+} from "@/components/ui/avatar"
+
+type Source = { name: string; initials: string; url: string }
 
 const QUESTIONS = [
   {
     id: "problem", section: "Problem",
     question: "What problem are we solving?",
     why: "37% of project failures start with unclear requirements.",
+    sources: [
+      { name: "PMI 2014", initials: "PMI", url: "https://www.pmi.org/-/media/pmi/documents/public/pdf/learning/thought-leadership/pulse/requirements-management.pdf" },
+    ] as Source[],
     suggestions: [
       "Designers spend more time managing AI output than solving real problems.",
       "Teams ship features no one uses because the problem was never defined.",
@@ -28,6 +38,9 @@ const QUESTIONS = [
     id: "user", section: "User",
     question: "Who is experiencing this problem?",
     why: "Unclear users drive up to 85% of rework costs.",
+    sources: [
+      { name: "Westfall 2005", initials: "WT", url: "https://ima.udg.edu/~sellares/EINF-ES2/The_Why_What_Who_When_and_How_Of_Software_Requirements.pdf" },
+    ] as Source[],
     suggestions: [
       "Product designers at early-stage startups building with AI tools.",
       "Founders shipping their first product without a dedicated PM.",
@@ -37,6 +50,9 @@ const QUESTIONS = [
     id: "why-now", section: "Why Now",
     question: "Why does this problem matter now?",
     why: "47% of missed goals trace to misaligned requirements.",
+    sources: [
+      { name: "PMI 2014", initials: "PMI", url: "https://www.pmi.org/-/media/pmi/documents/public/pdf/learning/thought-leadership/pulse/requirements-management.pdf" },
+    ] as Source[],
     suggestions: [
       "AI tools accelerate shipping but amplify undefined problems.",
       "The team is about to start a sprint with no shared brief.",
@@ -46,6 +62,9 @@ const QUESTIONS = [
     id: "success", section: "Success",
     question: "What does success look like?",
     why: "52% of projects experience scope creep without a clear success metric.",
+    sources: [
+      { name: "PMI 2018", initials: "PMI", url: "https://www.pmi.org/learning/library/scope-creep-rising-11308" },
+    ] as Source[],
     suggestions: [
       "The team starts the sprint without a single clarifying meeting.",
       "AI tools generate on-target output from the first prompt.",
@@ -55,6 +74,9 @@ const QUESTIONS = [
     id: "constraints", section: "Constraints",
     question: "What constraints should we consider?",
     why: "Large projects average 45% over budget without explicit constraints.",
+    sources: [
+      { name: "McKinsey 2012", initials: "MK", url: "https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value" },
+    ] as Source[],
     suggestions: [
       "No backend — must work entirely client-side, no login required.",
       "Two-week sprint, team of two, no existing design system.",
@@ -64,6 +86,9 @@ const QUESTIONS = [
     id: "mvp", section: "MVP",
     question: "What is the smallest version we could build?",
     why: "Small, focused scopes are 10× more likely to succeed than large undefined ones.",
+    sources: [
+      { name: "Standish 2013", initials: "ST", url: "https://athena.ecs.csus.edu/~buckley/CSc231_files/Standish_2013_Report.pdf" },
+    ] as Source[],
     suggestions: [
       "A single form that exports a one-page scope brief as Markdown.",
       "A shared template filled out collaboratively before every sprint.",
@@ -73,6 +98,9 @@ const QUESTIONS = [
     id: "risk", section: "Risk",
     question: "What could make this project fail?",
     why: "17% of IT projects fail catastrophically due to unaddressed risks.",
+    sources: [
+      { name: "McKinsey 2012", initials: "MK", url: "https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value" },
+    ] as Source[],
     suggestions: [
       "Teams skip the process under deadline pressure.",
       "Stakeholders won't see value until after the sprint ends.",
@@ -82,6 +110,10 @@ const QUESTIONS = [
     id: "no-build", section: "If Not Built",
     question: "What would happen if we didn't build this?",
     why: "Fixing a brief is 100× cheaper than fixing it after launch.",
+    sources: [
+      { name: "NASA 2004", initials: "NASA", url: "https://ntrs.nasa.gov/api/citations/20100036670/downloads/20100036670.pdf" },
+      { name: "Westfall 2005", initials: "WT", url: "https://ima.udg.edu/~sellares/EINF-ES2/The_Why_What_Who_When_and_How_Of_Software_Requirements.pdf" },
+    ] as Source[],
     suggestions: [
       "Teams keep starting sprints blind, wasting the first week on alignment.",
       "AI coding tools keep generating solutions to the wrong problem.",
@@ -226,6 +258,7 @@ export function ClaritySprint() {
             key={currentStep}
             question={QUESTIONS[currentStep].question}
             why={QUESTIONS[currentStep].why}
+            sources={(QUESTIONS[currentStep] as unknown as { sources: Source[] }).sources}
             section={QUESTIONS[currentStep].section}
             suggestions={QUESTIONS[currentStep].suggestions}
             step={currentStep}
@@ -261,7 +294,7 @@ export function ClaritySprint() {
 
 // ─── Ticker Text ──────────────────────────────────────────────────────────────
 
-function TickerText({ items }: { items: [string, string] }) {
+function TickerText({ items, sources }: { items: [string, string]; sources: Source[] }) {
   const [index, setIndex] = React.useState(0)
   const [visible, setVisible] = React.useState(true)
   const [reduceMotion, setReduceMotion] = React.useState(false)
@@ -282,8 +315,10 @@ function TickerText({ items }: { items: [string, string] }) {
     return () => clearInterval(timer)
   }, [reduceMotion])
 
+  const showingSources = index === 1 && sources.length > 0
+
   return (
-    <div className="h-12 flex items-start">
+    <div className="h-16 flex flex-col justify-start gap-1.5">
       <span
         className="block text-sm text-muted-foreground font-mono"
         style={{
@@ -294,6 +329,31 @@ function TickerText({ items }: { items: [string, string] }) {
       >
         {items[index]}
       </span>
+      <div
+        style={{
+          opacity: visible && showingSources ? 1 : 0,
+          transition: reduceMotion ? "none" : "opacity 0.4s ease",
+        }}
+      >
+        <AvatarGroup>
+          {sources.map((source) => (
+            <a
+              key={source.url}
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={source.name}
+              title={source.name}
+            >
+              <Avatar size="sm">
+                <AvatarFallback className="text-[9px] font-mono font-medium">
+                  {source.initials}
+                </AvatarFallback>
+              </Avatar>
+            </a>
+          ))}
+        </AvatarGroup>
+      </div>
     </div>
   )
 }
@@ -303,6 +363,7 @@ function TickerText({ items }: { items: [string, string] }) {
 type QuestionViewProps = {
   question: string
   why: string
+  sources: Source[]
   section: string
   suggestions: readonly [string, string]
   step: number
@@ -320,6 +381,7 @@ type QuestionViewProps = {
 function QuestionView({
   question,
   why,
+  sources,
   suggestions,
   step,
   total,
@@ -356,7 +418,7 @@ function QuestionView({
       {/* Question + options area */}
       <div className="flex-1 flex flex-col justify-center px-6 pb-24">
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
-        <TickerText items={[question, why]} />
+        <TickerText items={[question, why]} sources={sources} />
 
         <div className="flex flex-col divide-y divide-border/50">
           {/* Suggestion 1 */}
