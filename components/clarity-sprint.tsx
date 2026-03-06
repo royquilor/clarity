@@ -450,7 +450,7 @@ function QuestionView({
               <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
             </Button>
           )}
-          <Button size="sm" onClick={onNext} aria-label={isLast ? "Finish" : "Next question"}>
+          <Button size="sm" onClick={onNext} disabled={!answer.trim()} aria-label={isLast ? "Finish" : "Next question"}>
             {isLast ? "Finish" : "Next"}
             <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
           </Button>
