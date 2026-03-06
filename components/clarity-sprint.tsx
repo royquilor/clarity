@@ -574,7 +574,7 @@ function ScorecardView({
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
-      <div className="flex-1 flex flex-col px-6 pt-8 pb-4 gap-8 max-w-lg">
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-32 gap-8 max-w-lg">
         {/* Score */}
         <div className="flex flex-col gap-1">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
@@ -628,7 +628,7 @@ function ScorecardView({
       </div>
 
       {/* Export + actions */}
-      <div className="px-5 pb-6 pt-4 flex flex-col gap-3">
+      <div className="fixed bottom-0 left-0 right-0 px-5 pt-4 bg-background flex flex-col gap-3" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onCopy} aria-label="Copy markdown">
             <HugeiconsIcon
