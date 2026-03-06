@@ -374,35 +374,37 @@ function QuestionView({
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
       {/* Question + answer area */}
-      <div className="flex-1 flex flex-col px-6 pt-10 pb-24 gap-6">
-        <p className="text-sm text-muted-foreground">{question}</p>
-        <div className="relative">
-          <textarea
-            ref={textareaRef}
-            value={answer}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            rows={3}
-            className={cn(
-              "relative z-10 w-full bg-transparent border-none outline-none resize-none",
-              "text-3xl font-medium leading-snug tracking-tight",
-              "touch-manipulation",
-            )}
-            style={{ fontSize: "clamp(1.5rem, 4vw, 1.875rem)" }}
-            aria-label={question}
-          />
-          {!answer && (
-            <div
-              className="absolute top-0 left-0 w-full pointer-events-none text-foreground/25 text-3xl font-medium leading-snug tracking-tight"
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24 gap-6">
+        <div className="w-full max-w-lg flex flex-col gap-6">
+          <p className="text-sm text-muted-foreground text-center">{question}</p>
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              value={answer}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              rows={3}
+              className={cn(
+                "relative z-10 w-full bg-transparent border-none outline-none resize-none",
+                "text-3xl font-medium leading-snug tracking-tight text-center",
+                "touch-manipulation",
+              )}
               style={{ fontSize: "clamp(1.5rem, 4vw, 1.875rem)" }}
-              aria-hidden="true"
-            >
-              <AnimatedExample
-                examples={examples}
-                onExampleChange={(ex) => { currentExampleRef.current = ex }}
-              />
-            </div>
-          )}
+              aria-label={question}
+            />
+            {!answer && (
+              <div
+                className="absolute top-0 left-0 w-full pointer-events-none text-foreground/25 text-3xl font-medium leading-snug tracking-tight text-center"
+                style={{ fontSize: "clamp(1.5rem, 4vw, 1.875rem)" }}
+                aria-hidden="true"
+              >
+                <AnimatedExample
+                  examples={examples}
+                  onExampleChange={(ex) => { currentExampleRef.current = ex }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
