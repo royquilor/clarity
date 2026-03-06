@@ -292,6 +292,21 @@ export function ClaritySprint() {
   )
 }
 
+// ─── Made By ──────────────────────────────────────────────────────────────────
+
+function MadeBy() {
+  return (
+    <a
+      href="https://www.enter404.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors duration-150 font-mono"
+    >
+      by Roy Quilor
+    </a>
+  )
+}
+
 // ─── Ticker Text ──────────────────────────────────────────────────────────────
 
 function TickerText({ items, sources }: { items: [string, string]; sources: Source[] }) {
@@ -415,6 +430,30 @@ function QuestionView({
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
+      {/* Step dots — top left */}
+      <div className="px-6 pt-5">
+        <div className="flex items-center gap-1" aria-label={`Step ${step + 1} of ${total}`}>
+          {Array.from({ length: total }).map((_, i) => {
+            const q = QUESTIONS[i]
+            const isAnswered = !!answers[q.id]?.trim()
+            const isCurrent = i === step
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "rounded-full transition-all duration-300",
+                  isCurrent
+                    ? "w-3 h-1.5 bg-foreground"
+                    : isAnswered
+                    ? "w-1.5 h-1.5 bg-foreground/50"
+                    : "w-1.5 h-1.5 bg-foreground/15",
+                )}
+              />
+            )
+          })}
+        </div>
+      </div>
+
       {/* Question + options area */}
       <div className="flex-1 flex flex-col justify-center px-6 pb-24">
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
@@ -479,27 +518,8 @@ function QuestionView({
         className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-6 pt-3 bg-background"
         style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
       >
-        {/* Step dots */}
-        <div className="flex items-center gap-1" aria-label={`Step ${step + 1} of ${total}`}>
-          {Array.from({ length: total }).map((_, i) => {
-            const q = QUESTIONS[i]
-            const isAnswered = !!answers[q.id]?.trim()
-            const isCurrent = i === step
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-full transition-all duration-300",
-                  isCurrent
-                    ? "w-3 h-1.5 bg-foreground"
-                    : isAnswered
-                    ? "w-1.5 h-1.5 bg-foreground/50"
-                    : "w-1.5 h-1.5 bg-foreground/15",
-                )}
-              />
-            )
-          })}
-        </div>
+        {/* Attribution */}
+        <MadeBy />
 
         <div className="flex items-center gap-1">
           {step > 0 && (
@@ -618,7 +638,8 @@ function ScorecardView({
             Download
           </Button>
         </div>
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-between">
+          <MadeBy />
           <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground">
             <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} data-icon="inline-start" />
             New Sprint
