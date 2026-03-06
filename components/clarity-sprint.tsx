@@ -285,7 +285,7 @@ function TickerText({ items }: { items: [string, string] }) {
   return (
     <div className="h-12 flex items-start">
       <span
-        className="block text-base text-muted-foreground"
+        className="block text-sm text-muted-foreground font-mono"
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(4px)",
