@@ -283,16 +283,18 @@ function TickerText({ items }: { items: [string, string] }) {
   }, [reduceMotion])
 
   return (
-    <span
-      className="block text-sm text-muted-foreground"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(4px)",
-        transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
-      }}
-    >
-      {items[index]}
-    </span>
+    <div className="h-12 flex items-start">
+      <span
+        className="block text-base text-muted-foreground"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(4px)",
+          transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
+        }}
+      >
+        {items[index]}
+      </span>
+    </div>
   )
 }
 
