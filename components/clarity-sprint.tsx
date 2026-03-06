@@ -18,82 +18,74 @@ const QUESTIONS = [
   {
     id: "problem", section: "Problem",
     question: "What problem are we solving?",
-    why: "37% of project failures trace back to unclear requirements.",
-    examples: [
-      "Designers are feeling drained with AI",
-      "Teams start sprints without a clear brief",
-      "Scope keeps shifting mid-project",
-    ],
+    why: "37% of project failures start with unclear requirements.",
+    suggestions: [
+      "Designers spend more time managing AI output than solving real problems.",
+      "Teams ship features no one uses because the problem was never defined.",
+    ] as const,
   },
   {
     id: "user", section: "User",
     question: "Who is experiencing this problem?",
-    why: "Missing stakeholder groups drive up to 85% of rework costs.",
-    examples: [
-      "Product designers at early-stage startups",
-      "Founders building their first product",
-      "Small dev teams without a dedicated PM",
-    ],
+    why: "Unclear users drive up to 85% of rework costs.",
+    suggestions: [
+      "Product designers at early-stage startups building with AI tools.",
+      "Founders shipping their first product without a dedicated PM.",
+    ] as const,
   },
   {
     id: "why-now", section: "Why Now",
     question: "Why does this problem matter now?",
-    why: "47% of missed goals trace to misaligned requirements — knowing the trigger prevents drift.",
-    examples: [
-      "AI tools ship faster but problems stay undefined",
-      "Remote teams struggle to align on scope",
-      "Funding depends on shipping something meaningful",
-    ],
+    why: "47% of missed goals trace to misaligned requirements.",
+    suggestions: [
+      "AI tools accelerate shipping but amplify undefined problems.",
+      "The team is about to start a sprint with no shared brief.",
+    ] as const,
   },
   {
     id: "success", section: "Success",
     question: "What does success look like?",
-    why: "Without a clear success metric, 52% of projects experience uncontrolled scope changes.",
-    examples: [
-      "Teams start sprints with a clear shared brief",
-      "Less back-and-forth during design review",
-      "AI tools generate relevant output on the first prompt",
-    ],
+    why: "52% of projects experience scope creep without a clear success metric.",
+    suggestions: [
+      "The team starts the sprint without a single clarifying meeting.",
+      "AI tools generate on-target output from the first prompt.",
+    ] as const,
   },
   {
     id: "constraints", section: "Constraints",
     question: "What constraints should we consider?",
-    why: "Large projects average 45% over budget when constraints aren't made explicit upfront.",
-    examples: [
-      "Must work without a login or account",
-      "No budget for a backend — client-side only",
-      "Needs to run in a browser, no installs",
-    ],
+    why: "Large projects average 45% over budget without explicit constraints.",
+    suggestions: [
+      "No backend — must work entirely client-side, no login required.",
+      "Two-week sprint, team of two, no existing design system.",
+    ] as const,
   },
   {
     id: "mvp", section: "MVP",
     question: "What is the smallest version we could build?",
     why: "Small, focused scopes are 10× more likely to succeed than large undefined ones.",
-    examples: [
-      "A single-page form that exports a markdown brief",
-      "A Figma plugin that captures meeting notes",
-      "A shared doc template the team fills in together",
-    ],
+    suggestions: [
+      "A single form that exports a one-page scope brief as Markdown.",
+      "A shared template filled out collaboratively before every sprint.",
+    ] as const,
   },
   {
     id: "risk", section: "Risk",
     question: "What could make this project fail?",
-    why: "17% of IT projects become black swans that can threaten a company's existence.",
-    examples: [
-      "Teams may skip it under time pressure",
-      "Stakeholders won't see value until after the sprint",
-      "Too many questions makes it feel like busywork",
-    ],
+    why: "17% of IT projects fail catastrophically due to unaddressed risks.",
+    suggestions: [
+      "Teams skip the process under deadline pressure.",
+      "Stakeholders won't see value until after the sprint ends.",
+    ] as const,
   },
   {
     id: "no-build", section: "If Not Built",
     question: "What would happen if we didn't build this?",
-    why: "Catching problems in the brief is 100× cheaper than fixing them after launch.",
-    examples: [
-      "Teams keep starting sprints blind",
-      "AI tools keep generating the wrong solutions",
-      "Design effort gets wasted on undefined problems",
-    ],
+    why: "Fixing a brief is 100× cheaper than fixing it after launch.",
+    suggestions: [
+      "Teams keep starting sprints blind, wasting the first week on alignment.",
+      "AI coding tools keep generating solutions to the wrong problem.",
+    ] as const,
   },
 ] as const
 
@@ -227,21 +219,15 @@ export function ClaritySprint() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Top strip */}
-      <div className="px-6 pt-6">
-        <p className="text-xs text-muted-foreground">
-          {appState === "questions" ? QUESTIONS[currentStep].why : stage.why}
-        </p>
-      </div>
-
       {/* Main */}
       <div className="flex-1 flex flex-col">
         {appState === "questions" && (
           <QuestionView
             key={currentStep}
             question={QUESTIONS[currentStep].question}
+            why={QUESTIONS[currentStep].why}
             section={QUESTIONS[currentStep].section}
-            examples={QUESTIONS[currentStep].examples}
+            suggestions={QUESTIONS[currentStep].suggestions}
             step={currentStep}
             total={QUESTIONS.length}
             answer={answers[QUESTIONS[currentStep].id] ?? ""}
@@ -273,15 +259,9 @@ export function ClaritySprint() {
   )
 }
 
-// ─── Animated Example ─────────────────────────────────────────────────────────
+// ─── Ticker Text ──────────────────────────────────────────────────────────────
 
-function AnimatedExample({
-  examples,
-  onExampleChange,
-}: {
-  examples: readonly string[]
-  onExampleChange?: (example: string) => void
-}) {
+function TickerText({ items }: { items: [string, string] }) {
   const [index, setIndex] = React.useState(0)
   const [visible, setVisible] = React.useState(true)
   const [reduceMotion, setReduceMotion] = React.useState(false)
@@ -291,31 +271,27 @@ function AnimatedExample({
   }, [])
 
   React.useEffect(() => {
-    onExampleChange?.(examples[index])
-  }, [index, examples, onExampleChange])
-
-  React.useEffect(() => {
-    if (examples.length <= 1 || reduceMotion) return
+    if (reduceMotion) return
     const timer = setInterval(() => {
       setVisible(false)
       setTimeout(() => {
-        setIndex((i) => (i + 1) % examples.length)
+        setIndex((i) => (i + 1) % 2)
         setVisible(true)
       }, 400)
     }, 3500)
     return () => clearInterval(timer)
-  }, [examples.length, reduceMotion])
+  }, [reduceMotion])
 
   return (
     <span
+      className="block text-sm text-muted-foreground"
       style={{
-        display: "block",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(6px)",
+        transform: visible ? "translateY(0)" : "translateY(4px)",
         transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
       }}
     >
-      {examples[index]}
+      {items[index]}
     </span>
   )
 }
@@ -324,8 +300,9 @@ function AnimatedExample({
 
 type QuestionViewProps = {
   question: string
+  why: string
   section: string
-  examples: readonly string[]
+  suggestions: readonly [string, string]
   step: number
   total: number
   answer: string
@@ -340,8 +317,8 @@ type QuestionViewProps = {
 
 function QuestionView({
   question,
-  section,
-  examples,
+  why,
+  suggestions,
   step,
   total,
   answer,
@@ -353,57 +330,80 @@ function QuestionView({
   textareaRef,
   onKeyDown,
 }: QuestionViewProps) {
-  const currentExampleRef = React.useRef<string>(examples[0])
+  const isSuggestionSelected = (suggestions as readonly string[]).includes(answer)
+  const hasSelection = !!answer
 
-  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  function getOptionClass(isSelected: boolean) {
+    if (!hasSelection) return "text-foreground/30"
+    return isSelected ? "text-foreground" : "text-foreground/15"
+  }
+
+  function handleSuggestionClick(suggestion: string) {
+    onChange(answer === suggestion ? "" : suggestion)
+  }
+
+  function handleTextareaChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     onChange(e.target.value)
     const el = e.target
     el.style.height = "auto"
     el.style.height = `${el.scrollHeight}px`
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Tab" && !answer) {
-      e.preventDefault()
-      onChange(currentExampleRef.current)
-    } else {
-      onKeyDown(e)
-    }
-  }
-
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
-      {/* Question + answer area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24 gap-6">
-        <div className="w-full max-w-lg flex flex-col gap-6">
-          <p className="text-sm text-muted-foreground text-center">{question}</p>
-          <div className="relative">
+      {/* Question + options area */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24 gap-8">
+        <TickerText items={[question, why]} />
+
+        <div className="w-full max-w-lg flex flex-col divide-y divide-border/50">
+          {/* Suggestion 1 */}
+          <button
+            type="button"
+            onClick={() => handleSuggestionClick(suggestions[0])}
+            className={cn(
+              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150",
+              getOptionClass(answer === suggestions[0]),
+            )}
+            style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
+          >
+            {suggestions[0]}
+          </button>
+
+          {/* Suggestion 2 */}
+          <button
+            type="button"
+            onClick={() => handleSuggestionClick(suggestions[1])}
+            className={cn(
+              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150",
+              getOptionClass(answer === suggestions[1]),
+            )}
+            style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
+          >
+            {suggestions[1]}
+          </button>
+
+          {/* Free text option */}
+          <div className="py-5">
             <textarea
               ref={textareaRef}
-              value={answer}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              rows={3}
+              value={isSuggestionSelected ? "" : answer}
+              onChange={handleTextareaChange}
+              onKeyDown={onKeyDown}
+              rows={1}
+              placeholder="Write your own…"
               className={cn(
-                "relative z-10 w-full bg-transparent border-none outline-none resize-none",
-                "text-3xl font-medium leading-snug tracking-tight text-center",
+                "w-full bg-transparent border-none outline-none resize-none text-left",
+                "font-medium leading-snug tracking-tight transition-colors duration-150",
                 "touch-manipulation",
+                !isSuggestionSelected && answer
+                  ? "text-foreground"
+                  : hasSelection
+                  ? "placeholder:text-foreground/15"
+                  : "placeholder:text-foreground/30",
               )}
-              style={{ fontSize: "clamp(1.5rem, 4vw, 1.875rem)" }}
-              aria-label={question}
+              style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
+              aria-label="Write your own answer"
             />
-            {!answer && (
-              <div
-                className="absolute top-0 left-0 w-full pointer-events-none text-foreground/25 text-3xl font-medium leading-snug tracking-tight text-center"
-                style={{ fontSize: "clamp(1.5rem, 4vw, 1.875rem)" }}
-                aria-hidden="true"
-              >
-                <AnimatedExample
-                  examples={examples}
-                  onExampleChange={(ex) => { currentExampleRef.current = ex }}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>
