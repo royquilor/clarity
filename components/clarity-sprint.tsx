@@ -10,7 +10,6 @@ import {
   Download01Icon,
   CheckmarkCircle01Icon,
   RotateClockwiseIcon,
-  SparklesIcon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
@@ -584,9 +583,6 @@ function ScorecardView({
             {Math.round(progress)}%
           </p>
           <div className="flex items-center gap-2 mt-1">
-            {isReady && (
-              <HugeiconsIcon icon={SparklesIcon} strokeWidth={2} className="text-emerald-500 size-4" />
-            )}
             <p className="text-sm text-muted-foreground">{readiness}</p>
           </div>
         </div>
@@ -601,7 +597,7 @@ function ScorecardView({
                 <span
                   className={cn(
                     "size-4 shrink-0",
-                    answered ? "text-emerald-500" : "text-foreground/20",
+                    answered ? "text-foreground" : "text-foreground/20",
                   )}
                   aria-hidden="true"
                 >
@@ -615,7 +611,7 @@ function ScorecardView({
                 </span>
                 <span
                   className={cn(
-                    "text-sm",
+                    "text-sm font-mono",
                     answered ? "text-foreground" : "text-foreground/30 line-through",
                   )}
                 >
@@ -628,29 +624,23 @@ function ScorecardView({
       </div>
 
       {/* Export + actions */}
-      <div className="fixed bottom-0 left-0 right-0 px-5 pt-4 bg-background flex flex-col gap-3" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={onCopy} aria-label="Copy markdown">
-            <HugeiconsIcon
-              icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
-              strokeWidth={2}
-              data-icon="inline-start"
-              className={cn(copied && "text-emerald-500")}
-            />
-            {copied ? "Copied" : "Copy Markdown"}
-          </Button>
-          <Button variant="outline" size="sm" onClick={onDownload} aria-label="Download .md file">
-            <HugeiconsIcon icon={Download01Icon} strokeWidth={2} data-icon="inline-start" />
-            Download
-          </Button>
-        </div>
-        <div className="flex items-center justify-between">
-          <MadeBy />
-          <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground">
-            <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} data-icon="inline-start" />
-            New Sprint
-          </Button>
-        </div>
+      <div className="fixed bottom-0 left-0 right-0 px-5 pt-4 bg-background flex items-center gap-2" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
+        <Button variant="outline" size="sm" onClick={onCopy} aria-label="Copy markdown">
+          <HugeiconsIcon
+            icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
+            strokeWidth={2}
+            data-icon="inline-start"
+            className={cn(copied && "text-foreground")}
+          />
+          {copied ? "Copied" : "Copy Markdown"}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground">
+          <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} data-icon="inline-start" />
+          New Sprint
+        </Button>
+        <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
+          <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
+        </Button>
       </div>
     </div>
   )
