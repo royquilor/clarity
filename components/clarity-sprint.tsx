@@ -374,7 +374,7 @@ function QuestionView({
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
       {/* Question + answer area */}
-      <div className="flex-1 flex flex-col px-6 pt-10 pb-4 gap-6">
+      <div className="flex-1 flex flex-col px-6 pt-10 pb-24 gap-6">
         <p className="text-sm text-muted-foreground">{question}</p>
         <div className="relative">
           <textarea
@@ -407,7 +407,10 @@ function QuestionView({
       </div>
 
       {/* Bottom nav */}
-      <div className="flex items-center justify-between px-5 pb-6 pt-2">
+      <div
+        className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-6 pt-3 bg-background"
+        style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
+      >
         {/* Step dots */}
         <div className="flex items-center gap-1" aria-label={`Step ${step + 1} of ${total}`}>
           {Array.from({ length: total }).map((_, i) => {
