@@ -354,10 +354,11 @@ function QuestionView({
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
       {/* Question + options area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24 gap-8">
+      <div className="flex-1 flex flex-col justify-center px-6 pb-24">
+        <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
         <TickerText items={[question, why]} />
 
-        <div className="w-full max-w-lg flex flex-col divide-y divide-border/50">
+        <div className="flex flex-col divide-y divide-border/50">
           {/* Suggestion 1 */}
           <button
             type="button"
@@ -407,6 +408,7 @@ function QuestionView({
               aria-label="Write your own answer"
             />
           </div>
+        </div>
         </div>
       </div>
 
