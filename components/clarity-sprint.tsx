@@ -47,18 +47,6 @@ const QUESTIONS = [
     ] as const,
   },
   {
-    id: "why-now", section: "Why Now",
-    question: "Why does this problem matter now?",
-    why: "47% of missed goals trace to misaligned requirements.",
-    sources: [
-      { name: "PMI 2014", initials: "PMI", url: "https://www.pmi.org/-/media/pmi/documents/public/pdf/learning/thought-leadership/pulse/requirements-management.pdf" },
-    ] as Source[],
-    suggestions: [
-      "AI tools accelerate shipping but amplify undefined problems.",
-      "The team is about to start a sprint with no shared brief.",
-    ] as const,
-  },
-  {
     id: "success", section: "Success",
     question: "What does success look like?",
     why: "52% of projects experience scope creep without a clear success metric.",
@@ -106,29 +94,16 @@ const QUESTIONS = [
       "Stakeholders won't see value until after the sprint ends.",
     ] as const,
   },
-  {
-    id: "no-build", section: "If Not Built",
-    question: "What would happen if we didn't build this?",
-    why: "Fixing a brief is 100× cheaper than fixing it after launch.",
-    sources: [
-      { name: "NASA 2004", initials: "NASA", url: "https://ntrs.nasa.gov/api/citations/20100036670/downloads/20100036670.pdf" },
-      { name: "Westfall 2005", initials: "WT", url: "https://ima.udg.edu/~sellares/EINF-ES2/The_Why_What_Who_When_and_How_Of_Software_Requirements.pdf" },
-    ] as Source[],
-    suggestions: [
-      "Teams keep starting sprints blind, wasting the first week on alignment.",
-      "AI coding tools keep generating solutions to the wrong problem.",
-    ] as const,
-  },
 ] as const
 
 type QuestionId = (typeof QUESTIONS)[number]["id"]
 
 const STAGES = [
   { threshold: 0,   label: "Chaos",      barColor: "bg-red-400",     why: "37% of project failures trace back to unclear requirements." },
-  { threshold: 20,  label: "Signal",     barColor: "bg-orange-400",  why: "47% of missed goals trace to misaligned requirements." },
-  { threshold: 40,  label: "Pattern",    barColor: "bg-yellow-500",  why: "50% of features shipped are rarely or never used." },
-  { threshold: 60,  label: "Framed",     barColor: "bg-teal-500",    why: "52% of projects experience uncontrolled scope changes." },
-  { threshold: 80,  label: "Structured", barColor: "bg-blue-500",    why: "Small, focused projects are 10× more likely to succeed." },
+  { threshold: 16,  label: "Signal",     barColor: "bg-orange-400",  why: "47% of missed goals trace to misaligned requirements." },
+  { threshold: 33,  label: "Pattern",    barColor: "bg-yellow-500",  why: "50% of features shipped are rarely or never used." },
+  { threshold: 50,  label: "Framed",     barColor: "bg-teal-500",    why: "52% of projects experience uncontrolled scope changes." },
+  { threshold: 66,  label: "Structured", barColor: "bg-blue-500",    why: "Small, focused projects are 10× more likely to succeed." },
   { threshold: 100, label: "Shaped",     barColor: "bg-emerald-500", why: "Catching problems in the brief is 100× cheaper than post-launch." },
 ]
 
@@ -148,21 +123,27 @@ function generateMarkdown(answers: Record<string, string>): string {
   return `# Project Scope\n\n${sections.join("\n\n")}`
 }
 
-function getSprintReadiness(progress: number) {
-  if (progress === 100) return "Ready for Sprint"
-  if (progress >= 80)   return "Almost Ready"
-  if (progress >= 60)   return "Getting There"
-  return "Needs More Work"
+const QUESTION_INSIGHTS: Record<string, string> = {
+  problem: "Without a clearly defined problem, teams risk building the right solution to the wrong question.",
+  user: "Unclear user definition leads to misaligned features — up to 85% of rework traces back to not knowing who you're building for.",
+  success: "Without a success metric, there's no finish line — 52% of projects experience scope creep when success isn't defined upfront.",
+  constraints: "Undefined constraints are a hidden budget risk. Large projects average 45% over budget without them.",
+  mvp: "Broad scope is the enemy of shipping. Small, focused scopes are 10× more likely to succeed than large, undefined ones.",
+  risk: "17% of IT projects fail catastrophically due to risks that were never surfaced before development began.",
 }
 
 const STORAGE_KEY = "clarity-sprint-v1"
 type AppState = "questions" | "scorecard"
+
+const ANALYSIS_KEY = "clarity-sprint-v1-analysis"
 
 export function ClaritySprint() {
   const [appState, setAppState] = React.useState<AppState>("questions")
   const [currentStep, setCurrentStep] = React.useState(0)
   const [answers, setAnswers] = React.useState<Record<string, string>>({})
   const [copied, setCopied] = React.useState(false)
+  const [aiInsight, setAiInsight] = React.useState<string>("")
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   React.useEffect(() => {
@@ -198,11 +179,43 @@ export function ClaritySprint() {
   const progress = (answeredCount / QUESTIONS.length) * 100
   const stage = getClarityStage(progress)
 
+  React.useEffect(() => {
+    if (appState !== "scorecard") return
+    try {
+      const cached = localStorage.getItem(ANALYSIS_KEY)
+      if (cached) { setAiInsight(cached); return }
+    } catch {}
+
+    setIsAnalyzing(true)
+    setAiInsight("")
+
+    fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers }),
+    }).then(async (res) => {
+      const reader = res.body?.getReader()
+      const decoder = new TextDecoder()
+      let text = ""
+      while (reader) {
+        const { done, value } = await reader.read()
+        if (done) break
+        text += decoder.decode(value, { stream: true })
+        setAiInsight(text)
+      }
+      try { localStorage.setItem(ANALYSIS_KEY, text) } catch {}
+    }).catch(() => {}).finally(() => setIsAnalyzing(false))
+  }, [appState])
+
   function handleReset() {
     setAnswers({})
     setCurrentStep(0)
     setAppState("questions")
-    try { localStorage.removeItem(STORAGE_KEY) } catch {}
+    setAiInsight("")
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(ANALYSIS_KEY)
+    } catch {}
   }
 
   function handleNext() {
@@ -307,6 +320,8 @@ export function ClaritySprint() {
             onCopy={handleCopy}
             onDownload={handleDownload}
             copied={copied}
+            aiInsight={aiInsight}
+            isAnalyzing={isAnalyzing}
           />
         )}
       </div>
@@ -557,6 +572,8 @@ type ScorecardViewProps = {
   onCopy: () => void
   onDownload: () => void
   copied: boolean
+  aiInsight: string
+  isAnalyzing: boolean
 }
 
 function ScorecardView({
@@ -567,60 +584,129 @@ function ScorecardView({
   onCopy,
   onDownload,
   copied,
+  aiInsight,
+  isAnalyzing,
 }: ScorecardViewProps) {
-  const readiness = getSprintReadiness(progress)
+  const strengths = QUESTIONS.filter((q) => !!answers[q.id]?.trim())
+  const gaps = QUESTIONS.filter((q) => !answers[q.id]?.trim())
   const isReady = progress === 100
+  const primaryGap = gaps[0]
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
-      <div className="flex-1 flex flex-col px-6 pt-8 pb-32 gap-8 max-w-lg">
-        {/* Score */}
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Clarity Score
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-32 gap-10 max-w-lg">
+
+        {/* Section 1 — Project Clarity Status */}
+        <div className="flex flex-col gap-3">
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Project Clarity
           </p>
-          <p className="text-6xl font-semibold tabular-nums tracking-tight">
-            {Math.round(progress)}%
-          </p>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm text-muted-foreground">{readiness}</p>
+          <p className="text-4xl font-semibold tracking-tight">{stage.label}</p>
+          {/* Stage track */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {STAGES.map((s, i) => {
+              const isCurrent = s.label === stage.label
+              const isPast = s.threshold <= stage.threshold
+              return (
+                <React.Fragment key={s.label}>
+                  <span
+                    className={cn(
+                      "text-xs font-mono transition-colors duration-300",
+                      isCurrent
+                        ? "text-foreground font-medium"
+                        : isPast
+                        ? "text-foreground/40"
+                        : "text-foreground/20",
+                    )}
+                  >
+                    {s.label}
+                  </span>
+                  {i < STAGES.length - 1 && (
+                    <span className="text-foreground/15 text-xs font-mono">—</span>
+                  )}
+                </React.Fragment>
+              )
+            })}
           </div>
         </div>
 
+        {/* Section 2 — Strengths */}
+        {strengths.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              Strengths
+            </p>
+            <ul className="flex flex-col gap-2">
+              {strengths.map((q) => (
+                <li key={q.id} className="flex items-center gap-2.5">
+                  <HugeiconsIcon icon={CheckmarkCircle01Icon} strokeWidth={2} className="size-4 shrink-0 text-foreground" />
+                  <span className="text-sm font-mono text-foreground">{q.section}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-        {/* Section checklist */}
-        <ul className="flex flex-col gap-3" aria-label="Section completion">
-          {QUESTIONS.map((q) => {
-            const answered = !!answers[q.id]?.trim()
-            return (
-              <li key={q.id} className="flex items-center gap-3">
-                <span
-                  className={cn(
-                    "size-4 shrink-0",
-                    answered ? "text-foreground" : "text-foreground/20",
-                  )}
-                  aria-hidden="true"
-                >
-                  {answered ? (
-                    <HugeiconsIcon icon={CheckmarkCircle01Icon} strokeWidth={2} className="size-4" />
-                  ) : (
-                    <svg viewBox="0 0 16 16" fill="none" className="size-4">
-                      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-                    </svg>
-                  )}
-                </span>
-                <span
-                  className={cn(
-                    "text-sm font-mono",
-                    answered ? "text-foreground" : "text-foreground/30 line-through",
-                  )}
-                >
+        {/* Section 3 — Needs Clarity */}
+        {gaps.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              Needs Clarity
+            </p>
+            <ul className="flex flex-col gap-2">
+              {gaps.map((q) => (
+                <li key={q.id} className="flex items-center gap-2.5">
+                  <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-foreground/30">
+                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2" />
+                  </svg>
+                  <span className="text-sm font-mono text-foreground/40">{q.section}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Section 4 — Insight (AI) */}
+        {(isAnalyzing || aiInsight) && (
+          <div className="flex flex-col gap-3">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              Insight
+            </p>
+            {isAnalyzing && !aiInsight ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-foreground/30 font-mono animate-pulse">Analyzing…</span>
+              </div>
+            ) : (
+              <p className="text-sm text-foreground/70 leading-relaxed">{aiInsight}</p>
+            )}
+          </div>
+        )}
+
+        {/* Section 5 — Suggested Next Step */}
+        {gaps.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              Suggested Next Step
+            </p>
+            <p className="text-sm text-foreground/70">Before starting the sprint, clarify:</p>
+            <ul className="flex flex-col gap-1.5">
+              {gaps.map((q) => (
+                <li key={q.id} className="text-sm font-mono text-foreground/60 flex items-center gap-2">
+                  <span className="text-foreground/30">·</span>
                   {q.section}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* All done */}
+        {isReady && (
+          <p className="text-sm text-foreground/60 font-mono">
+            All areas defined. Ready for sprint.
+          </p>
+        )}
+
       </div>
 
       {/* Export + actions */}
