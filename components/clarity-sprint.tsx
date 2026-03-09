@@ -12,6 +12,7 @@ import {
   RotateClockwiseIcon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
+import { track } from "@vercel/analytics"
 import { motion } from "framer-motion"
 import {
   Avatar,
@@ -156,6 +157,10 @@ export function ClaritySprint() {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   React.useEffect(() => {
+    track("clarity_started")
+  }, [])
+
+  React.useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
@@ -187,6 +192,10 @@ export function ClaritySprint() {
   const answeredCount = QUESTIONS.filter((q) => answers[q.id]?.trim()).length
   const progress = (answeredCount / QUESTIONS.length) * 100
   const stage = getClarityStage(progress)
+
+  React.useEffect(() => {
+    if (appState === "scorecard") track("clarity_completed")
+  }, [appState])
 
   React.useEffect(() => {
     if (appState !== "scorecard") return
