@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
 import { NextRequest } from "next/server"
+import { z } from "zod"
 
 const anthropic = new Anthropic()
 
@@ -14,16 +15,24 @@ const ratelimit = new Ratelimit({
   prefix: "clarity:analyze",
 })
 
-const ALLOWED_KEYS = ["problem", "user", "success", "constraints", "mvp", "risk"] as const
-const MAX_ANSWER_LENGTH = 500
+const AnswersSchema = z.object({
+  answers: z.object({
+    problem:     z.string().max(500).optional(),
+    user:        z.string().max(500).optional(),
+    success:     z.string().max(500).optional(),
+    constraints: z.string().max(500).optional(),
+    mvp:         z.string().max(500).optional(),
+    risk:        z.string().max(500).optional(),
+  }),
+})
 
 const QUESTION_LABELS: Record<string, string> = {
-  problem: "Problem",
-  user: "User",
-  success: "Success",
+  problem:     "Problem",
+  user:        "User",
+  success:     "Success",
   constraints: "Constraints",
-  mvp: "MVP",
-  risk: "Risk",
+  mvp:         "MVP",
+  risk:        "Risk",
 }
 
 export async function POST(req: NextRequest) {
@@ -34,7 +43,7 @@ export async function POST(req: NextRequest) {
     return new Response("Too many requests. Please try again later.", { status: 429 })
   }
 
-  // Input validation
+  // Parse and validate with Zod
   let body: unknown
   try {
     body = await req.json()
@@ -42,27 +51,26 @@ export async function POST(req: NextRequest) {
     return new Response("Invalid request body.", { status: 400 })
   }
 
-  if (!body || typeof body !== "object" || !("answers" in body) || typeof (body as Record<string, unknown>).answers !== "object") {
+  const parsed = AnswersSchema.safeParse(body)
+  if (!parsed.success) {
     return new Response("Invalid answers format.", { status: 400 })
   }
 
-  const rawAnswers = (body as { answers: Record<string, unknown> }).answers
-
-  // Only allow known keys, sanitize values
-  const answers: Record<string, string> = {}
-  for (const key of ALLOWED_KEYS) {
-    const val = rawAnswers[key]
-    if (typeof val === "string" && val.trim()) {
-      answers[key] = val.trim().slice(0, MAX_ANSWER_LENGTH)
-    }
-  }
+  // Sanitize: trim values and drop empty strings
+  const raw = parsed.data.answers
+  const answers = Object.fromEntries(
+    Object.entries(raw)
+      .map(([k, v]) => [k, v?.trim()])
+      .filter(([, v]) => !!v)
+  ) as Record<string, string>
 
   if (Object.keys(answers).length === 0) {
     return new Response("No valid answers provided.", { status: 400 })
   }
 
-  const answered = ALLOWED_KEYS.filter((k) => answers[k])
-  const unanswered = ALLOWED_KEYS.filter((k) => !answers[k])
+  const keys = Object.keys(QUESTION_LABELS)
+  const answered = keys.filter((k) => answers[k])
+  const unanswered = keys.filter((k) => !answers[k])
 
   const answerBlock = answered
     .map((k) => `${QUESTION_LABELS[k]}: ${answers[k]}`)

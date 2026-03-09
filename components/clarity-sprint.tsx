@@ -135,6 +135,14 @@ const QUESTION_INSIGHTS: Record<string, string> = {
 const STORAGE_KEY = "clarity-sprint-v1"
 type AppState = "questions" | "scorecard"
 
+const LOADING_MESSAGES = [
+  "Noted.",
+  "Sharpening the picture…",
+  "One less unknown.",
+  "Getting clearer…",
+  "Filed away.",
+]
+
 const ANALYSIS_KEY = "clarity-sprint-v1-analysis"
 
 export function ClaritySprint() {
@@ -144,6 +152,7 @@ export function ClaritySprint() {
   const [copied, setCopied] = React.useState(false)
   const [aiInsight, setAiInsight] = React.useState<string>("")
   const [isAnalyzing, setIsAnalyzing] = React.useState(false)
+  const [transitionMessage, setTransitionMessage] = React.useState<string>("")
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   React.useEffect(() => {
@@ -219,11 +228,16 @@ export function ClaritySprint() {
   }
 
   function handleNext() {
-    if (currentStep < QUESTIONS.length - 1) {
-      setCurrentStep((s) => s + 1)
-    } else {
-      setAppState("scorecard")
-    }
+    const msg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+    setTransitionMessage(msg)
+    setTimeout(() => {
+      setTransitionMessage("")
+      if (currentStep < QUESTIONS.length - 1) {
+        setCurrentStep((s) => s + 1)
+      } else {
+        setAppState("scorecard")
+      }
+    }, 2400)
   }
 
   function handleBack() {
@@ -300,6 +314,7 @@ export function ClaritySprint() {
             suggestions={QUESTIONS[currentStep].suggestions}
             step={currentStep}
             answer={answers[QUESTIONS[currentStep].id] ?? ""}
+            transitionMessage={transitionMessage}
             onChange={(val) =>
               setAnswers((prev) => ({ ...prev, [QUESTIONS[currentStep].id]: val }))
             }
@@ -344,6 +359,48 @@ function MadeBy() {
   )
 }
 
+// ─── Clarity Symbol ───────────────────────────────────────────────────────────
+
+function ClaritySymbol({ isBlurring }: { isBlurring: boolean }) {
+  return (
+    <motion.svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      className="shrink-0 mt-0.5"
+      animate={
+        isBlurring
+          ? {
+              filter: [
+                "blur(0px)",
+                "blur(3.5px)",
+                "blur(0.5px)",
+                "blur(3.5px)",
+                "blur(0px)",
+              ],
+              opacity: [1, 0.5, 0.8, 0.5, 1],
+            }
+          : { filter: "blur(0px)", opacity: 1 }
+      }
+      transition={
+        isBlurring
+          ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+          : { duration: 0.4 }
+      }
+    >
+      <circle
+        cx="8"
+        cy="8"
+        r="6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        className={isBlurring ? "text-foreground" : "text-muted-foreground/50"}
+      />
+    </motion.svg>
+  )
+}
+
 // ─── Ticker Text ──────────────────────────────────────────────────────────────
 
 function TickerText({ items, sources }: { items: [string, string]; sources: Source[] }) {
@@ -370,20 +427,25 @@ function TickerText({ items, sources }: { items: [string, string]; sources: Sour
   const showingSources = index === 1 && sources.length > 0
 
   return (
-    <div className="h-16 flex flex-col justify-start gap-1.5">
-      <span
-        className="block text-sm text-muted-foreground font-mono"
-        style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(4px)",
-          transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
-        }}
-      >
-        {items[index]}
-      </span>
+    <div
+      className="flex flex-col justify-start gap-1.5 min-h-16"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(4px)",
+        transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
+      }}
+    >
+      <div className="relative">
+        <div className="absolute top-0.5" style={{ left: "-20px" }}>
+          <ClaritySymbol isBlurring={false} />
+        </div>
+        <span className="text-sm text-muted-foreground font-mono">
+          {items[index]}
+        </span>
+      </div>
       <div
         style={{
-          opacity: visible && showingSources ? 1 : 0,
+          opacity: showingSources ? 1 : 0,
           transition: reduceMotion ? "none" : "opacity 0.4s ease",
         }}
       >
@@ -420,6 +482,7 @@ type QuestionViewProps = {
   suggestions: readonly [string, string]
   step: number
   answer: string
+  transitionMessage: string
   onChange: (value: string) => void
   onNext: () => void
   onBack: () => void
@@ -435,6 +498,7 @@ function QuestionView({
   suggestions,
   step,
   answer,
+  transitionMessage,
   onChange,
   onNext,
   onBack,
@@ -477,9 +541,25 @@ function QuestionView({
       {/* Question + options area */}
       <div className="flex-1 flex flex-col justify-center px-6 pb-24">
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
-        <TickerText items={[question, why]} sources={sources} />
+        {transitionMessage ? (
+          <div className="h-16 flex flex-col justify-start gap-1.5">
+            <div className="relative animate-in fade-in-0 duration-200">
+              <div className="absolute top-0.5" style={{ left: "-20px" }}>
+                <ClaritySymbol isBlurring={true} />
+              </div>
+              <span className="text-sm text-foreground font-mono">
+                {transitionMessage}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <TickerText items={[question, why]} sources={sources} />
+        )}
 
-        <div className="flex flex-col divide-y divide-border/50">
+        <div
+          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200"
+          style={{ opacity: transitionMessage ? 0.15 : 1 }}
+        >
           {/* Suggestion 1 */}
           <button
             type="button"
@@ -552,7 +632,7 @@ function QuestionView({
               <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
             </Button>
           )}
-          <Button size="sm" onClick={onNext} disabled={!answer.trim()} aria-label={isLast ? "Finish" : "Next question"}>
+          <Button size="sm" onClick={onNext} disabled={!answer.trim() || !!transitionMessage} aria-label={isLast ? "Finish" : "Next question"}>
             {isLast ? "Finish" : "Next"}
             <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
           </Button>
