@@ -437,22 +437,21 @@ function TickerText({ items, sources }: { items: [string, string]; sources: Sour
 
   return (
     <div
-      className="flex flex-col justify-start gap-1.5 min-h-16"
+      className="flex flex-col justify-start gap-1.5 min-h-20"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(4px)",
         transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
       }}
     >
-      <div className="relative">
-        <div className="absolute top-0.5" style={{ left: "-20px" }}>
-          <ClaritySymbol isBlurring={false} />
-        </div>
+      <div className="flex items-start gap-1.5">
+        <ClaritySymbol isBlurring={false} />
         <span className="text-sm text-muted-foreground font-mono">
           {items[index]}
         </span>
       </div>
       <div
+        className="ml-[22px]"
         style={{
           opacity: showingSources ? 1 : 0,
           transition: reduceMotion ? "none" : "opacity 0.4s ease",
@@ -552,10 +551,8 @@ function QuestionView({
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
         {transitionMessage ? (
           <div className="h-16 flex flex-col justify-start gap-1.5">
-            <div className="relative animate-in fade-in-0 duration-200">
-              <div className="absolute top-0.5" style={{ left: "-20px" }}>
-                <ClaritySymbol isBlurring={true} />
-              </div>
+            <div className="flex items-start gap-1.5 animate-in fade-in-0 duration-200">
+              <ClaritySymbol isBlurring={true} />
               <span className="text-sm text-foreground font-mono">
                 {transitionMessage}
               </span>
@@ -566,7 +563,7 @@ function QuestionView({
         )}
 
         <div
-          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200"
+          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200 ml-[22px]"
           style={{ opacity: transitionMessage ? 0.15 : 1 }}
         >
           {/* Suggestion 1 */}
