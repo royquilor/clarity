@@ -154,6 +154,7 @@ export function ClaritySprint() {
   const [aiInsight, setAiInsight] = React.useState<string>("")
   const [isAnalyzing, setIsAnalyzing] = React.useState(false)
   const [transitionMessage, setTransitionMessage] = React.useState<string>("")
+  const [isReflecting, setIsReflecting] = React.useState(false)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   React.useEffect(() => {
@@ -237,16 +238,41 @@ export function ClaritySprint() {
   }
 
   function handleNext() {
-    const msg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
-    setTransitionMessage(msg)
-    setTimeout(() => {
+    // If a reflection is already showing, advance to the next step
+    if (transitionMessage) {
       setTransitionMessage("")
       if (currentStep < QUESTIONS.length - 1) {
         setCurrentStep((s) => s + 1)
       } else {
         setAppState("scorecard")
       }
-    }, 2400)
+      return
+    }
+
+    // Otherwise fetch a reflection first
+    const fallback = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+    const q = QUESTIONS[currentStep]
+    const answer = answers[q.id] ?? ""
+
+    setIsReflecting(true)
+    setTransitionMessage("Thinking…")
+
+    fetch("/api/reflect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q.question, answer }),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error()
+        const text = await res.text()
+        setTransitionMessage(text || fallback)
+      })
+      .catch(() => {
+        setTransitionMessage(fallback)
+      })
+      .finally(() => {
+        setIsReflecting(false)
+      })
   }
 
   function handleBack() {
@@ -308,6 +334,7 @@ export function ClaritySprint() {
             onNext={handleNext}
             onBack={handleBack}
             isLast={currentStep === QUESTIONS.length - 1}
+            isReflecting={isReflecting}
             textareaRef={textareaRef}
             onKeyDown={handleKeyDown}
           />
@@ -496,6 +523,7 @@ type QuestionViewProps = {
   onNext: () => void
   onBack: () => void
   isLast: boolean
+  isReflecting: boolean
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
 }
@@ -512,6 +540,7 @@ function QuestionView({
   onNext,
   onBack,
   isLast,
+  isReflecting,
   textareaRef,
   onKeyDown,
 }: QuestionViewProps) {
@@ -536,14 +565,14 @@ function QuestionView({
 
   React.useEffect(() => {
     function handleGlobalKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && answer.trim()) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && (answer.trim() || transitionMessage) && !isReflecting) {
         e.preventDefault()
         onNext()
       }
     }
     window.addEventListener("keydown", handleGlobalKeyDown)
     return () => window.removeEventListener("keydown", handleGlobalKeyDown)
-  }, [answer, onNext])
+  }, [answer, transitionMessage, isReflecting, onNext])
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
@@ -639,7 +668,7 @@ function QuestionView({
               <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
             </Button>
           )}
-          <Button size="sm" onClick={onNext} disabled={!answer.trim() || !!transitionMessage} aria-label={isLast ? "Finish" : "Next question"}>
+          <Button size="sm" onClick={onNext} disabled={!answer.trim() || isReflecting} aria-label={isLast ? "Finish" : "Next question"}>
             {isLast ? "Finish" : "Next"}
             <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
           </Button>
@@ -725,7 +754,7 @@ function ScorecardView({
 
 {/* Section 3 — Needs Clarity */}
         {gaps.length > 0 && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 ml-[28px]">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Needs Clarity
             </p>
@@ -760,7 +789,7 @@ function ScorecardView({
 
 {/* Section 5 — Suggested Next Step */}
         {gaps.length > 0 && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 ml-[28px]">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Suggested Next Step
             </p>
