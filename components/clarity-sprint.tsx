@@ -287,29 +287,7 @@ export function ClaritySprint() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Step dots — top left, outside keyed QuestionView so they animate per-dot */}
-      {appState === "questions" && (
-        <div className="px-6 pt-5">
-          <div className="flex items-center gap-1" aria-label={`Step ${currentStep + 1} of ${QUESTIONS.length}`}>
-            {QUESTIONS.map((q, i) => {
-              const isAnswered = !!answers[q.id]?.trim()
-              const isCurrent = i === currentStep
-              return (
-                <motion.div
-                  key={i}
-                  className="rounded-full bg-foreground"
-                  animate={{
-                    width: isCurrent ? 12 : 6,
-                    height: 6,
-                    opacity: isCurrent ? 1 : isAnswered ? 0.5 : 0.15,
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )
-            })}
-          </div>
-        </div>
-      )}
+      {/* Step dots — hidden, replaced by ClaritySymbol progress indicator */}
 
       {/* Main */}
       <div className="flex-1 flex flex-col">
@@ -370,14 +348,19 @@ function MadeBy() {
 
 // ─── Clarity Symbol ───────────────────────────────────────────────────────────
 
-function ClaritySymbol({ isBlurring }: { isBlurring: boolean }) {
+function ClaritySymbol({ isBlurring, step = 0 }: { isBlurring: boolean; step?: number }) {
+  const r = 6
+  const circumference = 2 * Math.PI * r
+  const filledSegments = step // 0–5 completed phases
+  const dashArray = (filledSegments / 6) * circumference
+
   return (
     <motion.svg
       width="16"
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      className="shrink-0 mt-0.5"
+      className="shrink-0 mt-1.5"
       animate={
         isBlurring
           ? {
@@ -398,13 +381,30 @@ function ClaritySymbol({ isBlurring }: { isBlurring: boolean }) {
           : { duration: 0.4 }
       }
     >
+      {/* Track */}
       <circle
         cx="8"
         cy="8"
-        r="6"
+        r={r}
         stroke="currentColor"
         strokeWidth="1.5"
-        className={isBlurring ? "text-foreground" : "text-muted-foreground/50"}
+        className="text-muted-foreground/20"
+      />
+      {/* Progress arc — starts at top (−90°) */}
+      <motion.circle
+        cx="8"
+        cy="8"
+        r={r}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        className="text-foreground"
+        fill="none"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference}
+        transform="rotate(-90 8 8)"
+        animate={{ strokeDashoffset: circumference - dashArray }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       />
     </motion.svg>
   )
@@ -412,7 +412,7 @@ function ClaritySymbol({ isBlurring }: { isBlurring: boolean }) {
 
 // ─── Ticker Text ──────────────────────────────────────────────────────────────
 
-function TickerText({ items, sources }: { items: [string, string]; sources: Source[] }) {
+function TickerText({ items, sources, step }: { items: [string, string]; sources: Source[]; step: number }) {
   const [index, setIndex] = React.useState(0)
   const [visible, setVisible] = React.useState(true)
   const [reduceMotion, setReduceMotion] = React.useState(false)
@@ -436,22 +436,22 @@ function TickerText({ items, sources }: { items: [string, string]; sources: Sour
   const showingSources = index === 1 && sources.length > 0
 
   return (
-    <div
-      className="flex flex-col justify-start gap-1.5 min-h-20"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(4px)",
-        transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
-      }}
-    >
-      <div className="flex items-start gap-1.5">
-        <ClaritySymbol isBlurring={false} />
+    <div className="flex items-start gap-3 min-h-20">
+      <ClaritySymbol isBlurring={false} step={step} />
+      <div
+        className="flex flex-col justify-start gap-1.5"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(4px)",
+          transition: reduceMotion ? "none" : "opacity 0.4s ease, transform 0.4s ease",
+        }}
+      >
+      <div>
         <span className="text-sm text-muted-foreground font-mono">
           {items[index]}
         </span>
       </div>
       <div
-        className="ml-[22px]"
         style={{
           opacity: showingSources ? 1 : 0,
           transition: reduceMotion ? "none" : "opacity 0.4s ease",
@@ -475,6 +475,7 @@ function TickerText({ items, sources }: { items: [string, string]; sources: Sour
             </a>
           ))}
         </AvatarGroup>
+      </div>
       </div>
     </div>
   )
@@ -547,23 +548,23 @@ function QuestionView({
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
       {/* Question + options area */}
-      <div className="flex-1 flex flex-col justify-center px-6 pb-24">
+      <div className="flex-1 flex flex-col px-6 pb-24 pt-32">
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
         {transitionMessage ? (
-          <div className="h-16 flex flex-col justify-start gap-1.5">
-            <div className="flex items-start gap-1.5 animate-in fade-in-0 duration-200">
-              <ClaritySymbol isBlurring={true} />
-              <span className="text-sm text-foreground font-mono">
+          <div className="h-16 flex flex-col justify-start">
+            <div className="flex items-start gap-3 animate-in fade-in-0 duration-200">
+              <ClaritySymbol isBlurring={true} step={step} />
+              <span className="text-sm text-foreground font-mono mt-1.5">
                 {transitionMessage}
               </span>
             </div>
           </div>
         ) : (
-          <TickerText items={[question, why]} sources={sources} />
+          <TickerText items={[question, why]} sources={sources} step={step} />
         )}
 
         <div
-          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200 ml-[22px]"
+          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200 ml-[28px]"
           style={{ opacity: transitionMessage ? 0.15 : 1 }}
         >
           {/* Suggestion 1 */}
@@ -680,13 +681,18 @@ function ScorecardView({
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in-0 duration-200">
-      <div className="flex-1 flex flex-col px-6 pt-8 pb-32 gap-10 max-w-lg">
+      <div className="flex-1 flex flex-col px-6 pt-32 pb-32">
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-10">
 
         {/* Section 1 — Project Clarity Status */}
         <div className="flex flex-col gap-3">
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-            Project Clarity
-          </p>
+          <div className="flex items-start gap-3">
+            <ClaritySymbol isBlurring={false} step={strengths.length} />
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-1.5">
+              Project Clarity
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 ml-[28px]">
           <p className="text-4xl font-semibold tracking-tight">{stage.label}</p>
           {/* Stage track */}
           <div className="flex items-center gap-1 flex-wrap">
@@ -714,26 +720,10 @@ function ScorecardView({
               )
             })}
           </div>
+          </div>
         </div>
 
-        {/* Section 2 — Strengths */}
-        {strengths.length > 0 && (
-          <div className="flex flex-col gap-3">
-            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Strengths
-            </p>
-            <ul className="flex flex-col gap-2">
-              {strengths.map((q) => (
-                <li key={q.id} className="flex items-center gap-2.5">
-                  <HugeiconsIcon icon={CheckmarkCircle01Icon} strokeWidth={2} className="size-4 shrink-0 text-foreground" />
-                  <span className="text-sm font-mono text-foreground">{q.section}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Section 3 — Needs Clarity */}
+{/* Section 3 — Needs Clarity */}
         {gaps.length > 0 && (
           <div className="flex flex-col gap-3">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
@@ -754,7 +744,7 @@ function ScorecardView({
 
         {/* Section 4 — Insight (AI) */}
         {(isAnalyzing || aiInsight) && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 ml-[28px]">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Insight
             </p>
@@ -768,7 +758,7 @@ function ScorecardView({
           </div>
         )}
 
-        {/* Section 5 — Suggested Next Step */}
+{/* Section 5 — Suggested Next Step */}
         {gaps.length > 0 && (
           <div className="flex flex-col gap-3">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
@@ -786,17 +776,41 @@ function ScorecardView({
           </div>
         )}
 
-        {/* All done */}
+        {/* Status */}
         {isReady && (
-          <p className="text-sm text-foreground/60 font-mono">
-            All areas defined. Ready for sprint.
-          </p>
+          <div className="flex flex-col gap-3 ml-[28px]">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              Status
+            </p>
+            <p className="text-sm text-foreground/60 font-mono">
+              All areas defined. Ready for sprint.
+            </p>
+          </div>
         )}
+
+        {/* About */}
+        <div className="flex flex-col gap-3 ml-[28px]">
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Clarity Report Complete
+          </p>
+          <p className="text-sm text-foreground/40 leading-relaxed">
+            This analysis was generated using Clarity.<br />
+            Clarity is part of Enter404 — tools for designers navigating the AI era.
+          </p>
+          <a
+            href="https://enter404.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-mono text-foreground/40 hover:text-foreground transition-colors duration-150"
+          >
+            enter404.com
+          </a>
+        </div>
 
       </div>
 
       {/* Export + actions */}
-      <div className="fixed bottom-0 left-0 right-0 px-5 pt-4 bg-background flex items-center gap-2" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
+      <div className="fixed bottom-0 left-0 right-0 px-5 pt-4 bg-background flex items-center justify-end gap-2" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
         <Button variant="outline" size="sm" onClick={onCopy} aria-label="Copy markdown">
           <HugeiconsIcon
             icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
@@ -813,6 +827,7 @@ function ScorecardView({
         <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
           <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
         </Button>
+      </div>
       </div>
     </div>
   )
