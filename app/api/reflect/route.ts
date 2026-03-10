@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 80,
+    max_tokens: 60,
     messages: [
       {
         role: "user",
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 Question: "${question}"
 Their answer: "${answer}"
 
-Write one sentence — a specific, insightful observation about their answer. Not generic advice. Reference what they actually said. No fluff, no filler, no bullet points.`,
+Write one short sentence (max 20 words) — a specific, insightful observation about their answer. Reference what they actually said. No fluff, no filler, no bullet points.`,
       },
     ],
   })

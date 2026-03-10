@@ -10,6 +10,7 @@ import {
   Download01Icon,
   CheckmarkCircle01Icon,
   RotateClockwiseIcon,
+  Mail01Icon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { track } from "@vercel/analytics"
@@ -313,7 +314,11 @@ export function ClaritySprint() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Step dots — hidden, replaced by ClaritySymbol progress indicator */}
+      {/* Top bar */}
+      <div className="fixed top-0 left-0 right-0 z-10 px-6 pt-5 pb-3 flex items-center gap-2 pointer-events-none">
+        <span className="text-sm font-semibold tracking-tight">Clarity</span>
+        <span className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1 py-px leading-none">BETA</span>
+      </div>
 
       {/* Main */}
       <div className="flex-1 flex flex-col">
@@ -580,10 +585,10 @@ function QuestionView({
       <div className="flex-1 flex flex-col px-6 pb-24 pt-32">
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
         {transitionMessage ? (
-          <div className="h-16 flex flex-col justify-start">
+          <div className="flex flex-col justify-start min-h-20">
             <div className="flex items-start gap-3 animate-in fade-in-0 duration-200">
               <ClaritySymbol isBlurring={true} step={step} />
-              <span className="text-sm text-foreground font-mono mt-1.5">
+              <span className="text-sm text-foreground font-mono mt-1.5 text-pretty">
                 {transitionMessage}
               </span>
             </div>
@@ -679,8 +684,8 @@ function QuestionView({
               <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
             </Button>
           )}
-          <Button size="sm" onClick={onNext} disabled={!answer.trim() || isReflecting} aria-label={isLast ? "Finish" : "Next question"}>
-            {isLast ? "Finish" : "Next"}
+          <Button size="sm" onClick={onNext} disabled={!answer.trim() || isReflecting} aria-label={transitionMessage ? (isLast ? "Finish" : "Next") : "Analyze"}>
+            {transitionMessage ? (isLast ? "Finish" : "Next") : "Analyze"}
             <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
           </Button>
         </div>
@@ -866,22 +871,26 @@ function ScorecardView({
           }}
         />
         <div className="relative flex items-center justify-end gap-2 px-5 pt-10 pb-6">
-        <Button variant="outline" size="sm" onClick={onCopy} aria-label="Copy markdown">
-          <HugeiconsIcon
-            icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
-            strokeWidth={2}
-            data-icon="inline-start"
-            className={cn(copied && "text-foreground")}
-          />
-          {copied ? "Copied" : "Copy Markdown"}
-        </Button>
-        <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground">
-          <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} data-icon="inline-start" />
-          New Sprint
-        </Button>
-        <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
-          <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
-        </Button>
+          <Button size="sm" onClick={onCopy} aria-label="Copy markdown">
+            <HugeiconsIcon
+              icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
+              strokeWidth={2}
+              data-icon="inline-start"
+              className={cn(copied && "text-foreground")}
+            />
+            {copied ? "Copied" : "Copy Markdown"}
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={onReset} aria-label="New Sprint">
+            <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
+            <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
+          </Button>
+          <Button variant="ghost" size="icon-sm" aria-label="Subscribe" asChild onClick={() => track("clarity_subscribe_click")}>
+            <a href="https://enter404.com?utm_source=clarity&utm_medium=tool" target="_blank" rel="noopener noreferrer">
+              <HugeiconsIcon icon={Mail01Icon} strokeWidth={2} />
+            </a>
+          </Button>
         </div>
       </div>
       </div>
