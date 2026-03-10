@@ -651,9 +651,20 @@ function QuestionView({
 
       {/* Bottom nav */}
       <div
-        className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-6 pt-3 bg-background"
+        className="fixed bottom-0 left-0 right-0"
         style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
       >
+        {/* Blur fade */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            maskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+          }}
+        />
+        <div className="relative flex items-center justify-between px-6 pt-10 pb-6">
         {/* Attribution */}
         <MadeBy />
 
@@ -672,6 +683,7 @@ function QuestionView({
             {isLast ? "Finish" : "Next"}
             <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
           </Button>
+        </div>
         </div>
       </div>
     </div>
@@ -839,7 +851,21 @@ function ScorecardView({
       </div>
 
       {/* Export + actions */}
-      <div className="fixed bottom-0 left-0 right-0 px-5 pt-4 bg-background flex items-center justify-end gap-2" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
+      <div
+        className="fixed bottom-0 left-0 right-0"
+        style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
+      >
+        {/* Blur fade */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            maskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+          }}
+        />
+        <div className="relative flex items-center justify-end gap-2 px-5 pt-10 pb-6">
         <Button variant="outline" size="sm" onClick={onCopy} aria-label="Copy markdown">
           <HugeiconsIcon
             icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
@@ -856,6 +882,7 @@ function ScorecardView({
         <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
           <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
         </Button>
+        </div>
       </div>
       </div>
     </div>
