@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { GrainGradient, grainGradientPresets } from "@paper-design/shaders-react";
-import type { GrainGradientShape } from "@paper-design/shaders-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AddIcon, EyeIcon, MinusSignIcon, PencilEditIcon } from "@hugeicons/core-free-icons";
 
-const SHAPES: GrainGradientShape[] = ["wave", "dots", "truchet", "corners", "ripple", "blob", "sphere"];
+const SHAPES = ["wave", "dots", "truchet", "corners", "ripple", "blob", "sphere"] as const;
+type GrainGradientShape = typeof SHAPES[number];
 const MAX_COLORS = 7;
 
 const defaultParams = grainGradientPresets[0].params;
@@ -214,7 +214,7 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
               <select
                 className="flex-1 bg-transparent text-xs text-gray-700 outline-none"
                 value="blur"
-                readOnly
+                onChange={() => {}}
               >
                 <option value="blur">Blur</option>
               </select>
