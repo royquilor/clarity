@@ -14,10 +14,10 @@ export default function LandingPage() {
         <h1 className="text-4xl font-semibold tracking-tight text-balance">
           Define your sprint before it starts.
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed text-balance">
+        <p className="text-sm font-mono text-muted-foreground leading-relaxed text-balance">
           Clarity helps teams answer the six questions that matter most before a sprint begins. Go from chaos to a structured project scope in minutes.
         </p>
-        <Button asChild size="sm" className="w-fit">
+        <Button asChild size="lg" className="w-fit">
           <Link href="/app">Start Sprint</Link>
         </Button>
       </div>
