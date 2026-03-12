@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { GrainGradientBg } from "@/components/grain-gradient-bg";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
-      <div className="flex flex-col gap-6 max-w-md">
+    <main className="relative min-h-screen flex flex-col items-center justify-center px-6">
+      <GrainGradientBg />
+      <div className="relative z-10 flex flex-col gap-6 max-w-md">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold tracking-tight">Clarity</span>
           <span className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1 py-px leading-none">BETA</span>
