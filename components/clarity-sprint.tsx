@@ -418,16 +418,16 @@ function ClaritySymbol({ isBlurring, step = 0 }: { isBlurring: boolean; step?: n
         cx="8"
         cy="8"
         r={r}
-        stroke="currentColor"
+        stroke="#FFAA80"
         strokeWidth="1.5"
-        className="text-muted-foreground/20"
+        opacity={0.35}
       />
       {/* Progress arc — starts at top (−90°) */}
       <motion.circle
         cx="8"
         cy="8"
         r={r}
-        stroke="currentColor"
+        stroke="#FF6B35"
         strokeWidth="1.5"
         strokeLinecap="round"
         className="text-foreground"
@@ -669,7 +669,7 @@ function QuestionView({
             WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
           }}
         />
-        <div className="relative flex items-center justify-between px-6 pt-10 pb-6">
+        <div className="relative flex items-center justify-between px-6 pt-10 pb-0">
         {/* Attribution */}
         <MadeBy />
 
@@ -870,7 +870,7 @@ function ScorecardView({
             WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
           }}
         />
-        <div className="relative flex items-center justify-end gap-2 px-5 pt-10 pb-6">
+        <div className="relative flex items-center justify-end gap-2 px-5 pt-10 pb-0">
           <Button size="sm" onClick={onCopy} aria-label="Copy markdown">
             <HugeiconsIcon
               icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
