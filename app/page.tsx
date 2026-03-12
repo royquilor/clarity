@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GrainGradientBg } from "@/components/grain-gradient-bg";
+import { HeroTicker } from "@/components/hero-ticker";
 
 export default function LandingPage() {
   return (
@@ -10,15 +11,13 @@ export default function LandingPage() {
         <span className="text-sm font-semibold tracking-tight">Clarity</span>
         <span className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1 py-px leading-none">BETA</span>
       </div>
-      <div className="relative z-10 flex flex-col gap-6 max-w-md items-center text-center">
-        <h1 className="text-4xl font-semibold tracking-tight text-balance">
-          Define your sprint before it starts.
-        </h1>
+      <div className="relative z-10 flex flex-col gap-6 max-w-lg items-center text-center">
+        <HeroTicker />
         <p className="text-sm font-mono text-muted-foreground leading-relaxed text-balance">
-          Clarity helps teams answer the six questions that matter most before a sprint begins. Go from chaos to a structured project scope in minutes.
+          Teams build the wrong things because they misunderstand the problem and fail to align before building.
         </p>
         <Button asChild size="lg" className="w-fit">
-          <Link href="/app">Start Sprint</Link>
+          <Link href="/app">Get Clarity</Link>
         </Button>
       </div>
     </main>
