@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 import { GrainGradient, grainGradientPresets } from "@paper-design/shaders-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AddIcon, EyeIcon, MinusSignIcon, PencilEditIcon } from "@hugeicons/core-free-icons";
@@ -17,7 +18,11 @@ function toColorEntries(colors: string[]): ColorEntry[] {
   return colors.map((hex) => ({ hex, visible: true }));
 }
 
+const COLOR_BACK_LIGHT = "#FAFAF9"
+const COLOR_BACK_DARK  = "#1e1b16"
+
 export function GrainGradientBg({ showControls = false }: { showControls?: boolean }) {
+  const { resolvedTheme } = useTheme()
   const [isMobile, setIsMobile] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -51,7 +56,11 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
   const [colorEntries, setColorEntries] = useState<ColorEntry[]>(
     toColorEntries(["#FFAA80"])
   );
-  const [colorBack, setColorBack] = useState("#FAFAF9");
+  const [colorBack, setColorBack] = useState(COLOR_BACK_LIGHT);
+
+  useEffect(() => {
+    setColorBack(resolvedTheme === "dark" ? COLOR_BACK_DARK : COLOR_BACK_LIGHT)
+  }, [resolvedTheme]);
   const [blurValue, setBlurValue] = useState(0);
   const [blurVisible, setBlurVisible] = useState(true);
 

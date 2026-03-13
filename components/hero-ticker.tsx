@@ -55,7 +55,7 @@ export function HeroSection() {
         <div className="pointer-events-none">
           <ClaritySymbol size={18} step={step} />
         </div>
-        <p className="absolute left-1/2 -translate-x-1/2 text-xs font-mono uppercase tracking-widest text-muted-foreground pointer-events-none text-center text-pretty">
+        <p className="absolute left-1/2 -translate-x-1/2 text-xs font-mono uppercase tracking-widest text-foreground pointer-events-none text-center text-pretty">
           Before building, teams need clarity.
         </p>
         <Button asChild size="sm" className="hidden sm:flex">
@@ -100,7 +100,7 @@ export function HeroSection() {
               href={current.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-mono text-muted-foreground/60 hover:text-muted-foreground transition-colors duration-150"
+              className="text-xs font-mono text-foreground/60 hover:text-foreground transition-colors duration-150"
             >
               {current.source}
             </a>

@@ -540,7 +540,7 @@ function QuestionView({
 
         <div
           className="flex flex-col divide-y divide-border/50 transition-opacity duration-200"
-          style={{ opacity: transitionMessage ? 0.15 : 1 }}
+          style={{ opacity: isReflecting || transitionMessage ? 0 : 1 }}
         >
           {/* Suggestion 1 */}
           <button
