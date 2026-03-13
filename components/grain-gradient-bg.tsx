@@ -19,9 +19,24 @@ function toColorEntries(colors: string[]): ColorEntry[] {
 
 export function GrainGradientBg({ showControls = false }: { showControls?: boolean }) {
   const [isMobile, setIsMobile] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMobile(window.matchMedia("(pointer: coarse)").matches);
+    setReduceMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const [shape, setShape] = useState<GrainGradientShape>("ripple");
@@ -45,7 +60,7 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
   const [breath, setBreath] = useState({ scale, offsetX, offsetY });
 
   useEffect(() => {
-    if (isMobile) return;
+    if (isMobile || reduceMotion || !isVisible) return;
     const start = performance.now();
     const FRAME_INTERVAL = 1000 / 30; // 30fps
     let lastFrame = 0;
@@ -62,7 +77,7 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
     }
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isMobile, scale, offsetX, offsetY]);
+  }, [isMobile, reduceMotion, isVisible, scale, offsetX, offsetY]);
 
   const activeColors = colorEntries.filter((c) => c.visible).map((c) => c.hex);
 
@@ -96,6 +111,7 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
   return (
     <>
       <div
+        ref={containerRef}
         className="absolute inset-0"
         style={{ filter: blurVisible && blurValue > 0 ? `blur(${blurValue}px)` : undefined }}
       >
