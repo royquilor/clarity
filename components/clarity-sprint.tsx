@@ -30,73 +30,73 @@ const QUESTIONS = [
   {
     id: "problem", section: "Problem",
     question: "What problem are we solving?",
-    why: "37% of project failures start with unclear requirements.",
+    why: "37% of projects fail because requirements are unclear.",
     sources: [
-      { name: "PMI 2014", initials: "PMI", url: "https://www.pmi.org/-/media/pmi/documents/public/pdf/learning/thought-leadership/pulse/requirements-management.pdf" },
+      { name: "PMI — Pulse of the Profession", initials: "PMI", url: "https://www.pmi.org/learning/library/pulse-of-the-profession-2018-strategy-implementation-11821" },
     ] as Source[],
     suggestions: [
-      "Designers spend more time managing AI output than solving real problems.",
-      "Teams ship features no one uses because the problem was never defined.",
+      "Teams ship features before clearly defining the real problem.",
+      "AI tools generate ideas faster than teams can evaluate them.",
     ] as const,
   },
   {
     id: "user", section: "User",
     question: "Who is experiencing this problem?",
-    why: "Unclear users drive up to 85% of rework costs.",
+    why: "42% of startups fail because there is no market need.",
     sources: [
-      { name: "Westfall 2005", initials: "WT", url: "https://ima.udg.edu/~sellares/EINF-ES2/The_Why_What_Who_When_and_How_Of_Software_Requirements.pdf" },
+      { name: "CB Insights — Top Reasons Startups Fail", initials: "CBI", url: "https://www.cbinsights.com/research/startup-failure-reasons-top/" },
     ] as Source[],
     suggestions: [
-      "Product designers at early-stage startups building with AI tools.",
-      "Founders shipping their first product without a dedicated PM.",
+      "Early-stage founders struggle to define product scope before building.",
+      "Designers using AI tools struggle to turn ideas into real products.",
     ] as const,
   },
   {
     id: "success", section: "Success",
     question: "What does success look like?",
-    why: "52% of projects experience scope creep without a clear success metric.",
+    why: "52% of projects experience scope creep due to unclear goals.",
     sources: [
-      { name: "PMI 2018", initials: "PMI", url: "https://www.pmi.org/learning/library/scope-creep-rising-11308" },
+      { name: "PMI — Pulse of the Profession", initials: "PMI", url: "https://www.pmi.org/learning/thought-leadership/pulse" },
     ] as Source[],
     suggestions: [
-      "The team starts the sprint without a single clarifying meeting.",
-      "AI tools generate on-target output from the first prompt.",
+      "A clear sprint plan the team agrees on before development starts.",
+      "A defined outcome that determines whether the sprint succeeded.",
     ] as const,
   },
   {
     id: "constraints", section: "Constraints",
     question: "What constraints should we consider?",
-    why: "Large projects average 45% over budget without explicit constraints.",
+    why: "Large IT projects run 45% over budget on average.",
     sources: [
-      { name: "McKinsey 2012", initials: "MK", url: "https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value" },
+      { name: "McKinsey — Delivering Large-Scale IT Projects", initials: "MK", url: "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value" },
     ] as Source[],
     suggestions: [
-      "No backend — must work entirely client-side, no login required.",
-      "Two-week sprint, team of two, no existing design system.",
+      "A small team with limited engineering time.",
+      "AI tools generating ideas faster than teams can prioritise them.",
     ] as const,
   },
   {
     id: "mvp", section: "MVP",
     question: "What is the smallest version we could build?",
-    why: "Small, focused scopes are 10× more likely to succeed than large undefined ones.",
+    why: "80% of product features are rarely or never used.",
     sources: [
-      { name: "Standish 2013", initials: "ST", url: "https://athena.ecs.csus.edu/~buckley/CSc231_files/Standish_2013_Report.pdf" },
+      { name: "Standish Group — CHAOS Report 2015", initials: "ST", url: "https://www.standishgroup.com/sample_research_files/CHAOSReport2015-Final.pdf" },
     ] as Source[],
     suggestions: [
-      "A single form that exports a one-page scope brief as Markdown.",
-      "A shared template filled out collaboratively before every sprint.",
+      "A simple tool that helps founders define a sprint in minutes.",
+      "A lightweight workflow that clarifies a project before building.",
     ] as const,
   },
   {
     id: "risk", section: "Risk",
     question: "What could make this project fail?",
-    why: "17% of IT projects fail catastrophically due to unaddressed risks.",
+    why: "17% of IT projects fail so badly they threaten the company's survival.",
     sources: [
-      { name: "McKinsey 2012", initials: "MK", url: "https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value" },
+      { name: "McKinsey — Delivering Large-Scale IT Projects", initials: "MK", url: "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value" },
     ] as Source[],
     suggestions: [
-      "Teams skip the process under deadline pressure.",
-      "Stakeholders won't see value until after the sprint ends.",
+      "Solving the founder's problem instead of the customer's problem.",
+      "Starting development before the team agrees on the scope.",
     ] as const,
   },
 ] as const
@@ -686,12 +686,9 @@ function ScorecardView({
 
         {/* Section 1 — Project Clarity Status */}
         <div className="flex flex-col gap-3">
-          <div className="flex items-start gap-3">
-            <ClaritySymbol isBlurring={false} step={strengths.length} />
-            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-1.5">
-              Project Clarity
-            </p>
-          </div>
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Project Clarity
+          </p>
           <div className="flex flex-col gap-3">
           <p className="text-4xl font-semibold tracking-tight">{stage.label}</p>
           {/* Stage track */}
