@@ -63,6 +63,18 @@ export function HeroSection() {
         </Button>
       </div>
 
+      {/* Attribution — fixed bottom center, desktop only */}
+      <div className="fixed bottom-0 left-0 right-0 z-10 hidden sm:flex justify-center pb-5">
+        <a
+          href="https://www.enter404.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors duration-150"
+        >
+          Made by Enter404
+        </a>
+      </div>
+
       {/* Mobile CTA — fixed bottom center */}
       <div className="fixed bottom-0 left-0 right-0 z-10 flex justify-center pb-8 sm:hidden">
         <Button asChild size="lg">

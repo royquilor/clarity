@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowLeft01Icon,
@@ -316,9 +317,8 @@ export function ClaritySprint() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-10 px-6 pt-5 pb-3 flex items-center gap-2 pointer-events-none">
-        <span className="text-sm font-semibold tracking-tight">Clarity</span>
-        <span className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1 py-px leading-none">BETA</span>
+      <div className="fixed top-0 left-0 z-10 px-6 pt-5 pb-3 pointer-events-none">
+        <ClaritySymbol size={18} step={answeredCount} isBlurring={isReflecting || !!transitionMessage} />
       </div>
 
       {/* Main */}
@@ -407,8 +407,7 @@ function TickerText({ items, sources, step }: { items: [string, string]; sources
   const showingSources = index === 1 && sources.length > 0
 
   return (
-    <div className="flex items-start gap-3 min-h-20">
-      <ClaritySymbol isBlurring={false} step={step} />
+    <div className="min-h-20">
       <div
         className="flex flex-col justify-start gap-1.5"
         style={{
@@ -525,9 +524,8 @@ function QuestionView({
         <div className="w-full max-w-lg mx-auto flex flex-col gap-8">
         {transitionMessage ? (
           <div className="flex flex-col justify-start min-h-20">
-            <div className="flex items-start gap-3 animate-in fade-in-0 duration-200">
-              <ClaritySymbol isBlurring={true} step={step} />
-              <span className="text-sm text-foreground font-mono mt-1.5 text-pretty">
+            <div className="animate-in fade-in-0 duration-200">
+              <span className="text-sm text-foreground font-mono text-pretty">
                 {transitionMessage}
               </span>
             </div>
@@ -537,15 +535,16 @@ function QuestionView({
         )}
 
         <div
-          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200 ml-[28px]"
+          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200"
           style={{ opacity: transitionMessage ? 0.15 : 1 }}
         >
           {/* Suggestion 1 */}
           <button
             type="button"
             onClick={() => handleSuggestionClick(suggestions[0])}
+            disabled={isReflecting || !!transitionMessage}
             className={cn(
-              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150",
+              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150 disabled:pointer-events-none",
               getOptionClass(answer === suggestions[0]),
             )}
             style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
@@ -557,8 +556,9 @@ function QuestionView({
           <button
             type="button"
             onClick={() => handleSuggestionClick(suggestions[1])}
+            disabled={isReflecting || !!transitionMessage}
             className={cn(
-              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150",
+              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150 disabled:pointer-events-none",
               getOptionClass(answer === suggestions[1]),
             )}
             style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
@@ -573,6 +573,7 @@ function QuestionView({
               value={isSuggestionSelected ? "" : answer}
               onChange={handleTextareaChange}
               onKeyDown={onKeyDown}
+              disabled={isReflecting || !!transitionMessage}
               rows={1}
               placeholder="Write your own…"
               className={cn(
@@ -608,10 +609,7 @@ function QuestionView({
             WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
           }}
         />
-        <div className="relative flex items-center justify-between px-6 pt-10 pb-0">
-        {/* Attribution */}
-        <MadeBy />
-
+        <div className="relative flex items-center justify-end px-6 pt-10 pb-0">
         <div className="flex items-center gap-1">
           {step > 0 && (
             <Button
@@ -623,9 +621,23 @@ function QuestionView({
               <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
             </Button>
           )}
-          <Button size="sm" onClick={onNext} disabled={!answer.trim() || isReflecting} aria-label={transitionMessage ? (isLast ? "Finish" : "Next") : "Analyze"}>
-            {transitionMessage ? (isLast ? "Finish" : "Next") : "Analyze"}
-            <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} data-icon="inline-end" />
+          <Button
+            size="sm"
+            onClick={onNext}
+            disabled={!answer.trim() || isReflecting}
+            aria-label={isReflecting ? "Analyzing…" : transitionMessage ? (isLast ? "Finish" : "Next") : "Analyze"}
+            className="min-w-[90px]"
+          >
+            {isReflecting ? (
+              <>
+                <Spinner />
+                Analyzing…
+              </>
+            ) : transitionMessage ? (
+              isLast ? "Finish" : "Next"
+            ) : (
+              "Analyze"
+            )}
           </Button>
         </div>
         </div>
@@ -677,7 +689,7 @@ function ScorecardView({
               Project Clarity
             </p>
           </div>
-          <div className="flex flex-col gap-3 ml-[28px]">
+          <div className="flex flex-col gap-3">
           <p className="text-4xl font-semibold tracking-tight">{stage.label}</p>
           {/* Stage track */}
           <div className="flex items-center gap-1 flex-wrap">
@@ -710,7 +722,7 @@ function ScorecardView({
 
 {/* Section 3 — Needs Clarity */}
         {gaps.length > 0 && (
-          <div className="flex flex-col gap-3 ml-[28px]">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Needs Clarity
             </p>
@@ -729,7 +741,7 @@ function ScorecardView({
 
         {/* Section 4 — Insight (AI) */}
         {(isAnalyzing || aiInsight) && (
-          <div className="flex flex-col gap-3 ml-[28px]">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Insight
             </p>
@@ -745,7 +757,7 @@ function ScorecardView({
 
 {/* Section 5 — Suggested Next Step */}
         {gaps.length > 0 && (
-          <div className="flex flex-col gap-3 ml-[28px]">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Suggested Next Step
             </p>
@@ -763,7 +775,7 @@ function ScorecardView({
 
         {/* Status */}
         {isReady && (
-          <div className="flex flex-col gap-3 ml-[28px]">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Status
             </p>
@@ -774,7 +786,7 @@ function ScorecardView({
         )}
 
         {/* About */}
-        <div className="flex flex-col gap-3 ml-[28px]">
+        <div className="flex flex-col gap-3">
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             Clarity Report Complete
           </p>

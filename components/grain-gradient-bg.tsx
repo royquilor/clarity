@@ -18,6 +18,12 @@ function toColorEntries(colors: string[]): ColorEntry[] {
 }
 
 export function GrainGradientBg({ showControls = false }: { showControls?: boolean }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
+
   const [shape, setShape] = useState<GrainGradientShape>("ripple");
   const [speed, setSpeed] = useState(defaultParams.speed ?? 1);
   const [softness, setSoftness] = useState(0.8);
@@ -39,19 +45,24 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
   const [breath, setBreath] = useState({ scale, offsetX, offsetY });
 
   useEffect(() => {
+    if (isMobile) return;
     const start = performance.now();
+    const FRAME_INTERVAL = 1000 / 30; // 30fps
+    let lastFrame = 0;
     function tick(now: number) {
+      rafRef.current = requestAnimationFrame(tick);
+      if (now - lastFrame < FRAME_INTERVAL) return;
+      lastFrame = now;
       const t = (now - start) / 1000;
       setBreath({
         scale: scale + Math.sin(t * 0.18) * 0.04,
         offsetX: offsetX + Math.sin(t * 0.13) * 0.03,
         offsetY: offsetY + Math.cos(t * 0.11) * 0.025,
       });
-      rafRef.current = requestAnimationFrame(tick);
     }
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [scale, offsetX, offsetY]);
+  }, [isMobile, scale, offsetX, offsetY]);
 
   const activeColors = colorEntries.filter((c) => c.visible).map((c) => c.hex);
 
@@ -71,6 +82,15 @@ export function GrainGradientBg({ showControls = false }: { showControls?: boole
     if (colorEntries.length < MAX_COLORS) {
       setColorEntries((prev) => [...prev, { hex: "#ffffff", visible: true }]);
     }
+  }
+
+  if (isMobile) {
+    return (
+      <div
+        className="absolute inset-0"
+        style={{ background: `radial-gradient(ellipse 80% 60% at 50% 40%, #FFAA80 0%, ${colorBack} 70%)` }}
+      />
+    );
   }
 
   return (
