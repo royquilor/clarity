@@ -529,7 +529,7 @@ function QuestionView({
         {transitionMessage ? (
           <div className="flex flex-col justify-start min-h-20">
             <div className="animate-in fade-in-0 duration-200">
-              <span className="text-sm text-foreground font-mono text-pretty">
+              <span className={cn("text-sm text-foreground font-mono text-pretty", isReflecting && "shimmer-text")}>
                 {transitionMessage}
               </span>
             </div>
