@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -317,8 +318,10 @@ export function ClaritySprint() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <div className="fixed top-0 left-0 z-10 px-6 pt-5 pb-3 pointer-events-none">
-        <ClaritySymbol size={18} step={answeredCount} isBlurring={isReflecting || !!transitionMessage} />
+      <div className="fixed top-0 left-0 z-10 px-6 pt-5 pb-3">
+        <Link href="/" aria-label="Back to home">
+          <ClaritySymbol size={18} step={answeredCount} isBlurring={isReflecting || !!transitionMessage} />
+        </Link>
       </div>
 
       {/* Main */}
