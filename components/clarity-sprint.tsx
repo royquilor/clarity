@@ -15,6 +15,7 @@ import {
   Mail01Icon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
+import { Progress } from "@/components/ui/progress"
 import { ClaritySymbol } from "@/components/clarity-symbol"
 import { track } from "@vercel/analytics"
 import { motion } from "framer-motion"
@@ -649,6 +650,39 @@ function QuestionView({
   )
 }
 
+// ─── Progress Stepper ─────────────────────────────────────────────────────────
+
+function ProgressStepper({ answers, progress }: { answers: Record<string, string>; progress: number }) {
+  const [displayValue, setDisplayValue] = React.useState(0)
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setDisplayValue(progress), 800)
+    return () => clearTimeout(t)
+  }, [progress])
+
+  return (
+    <div className="overflow-x-auto scrollbar-hide -mx-6 px-6">
+      <div className="min-w-[440px] flex flex-col gap-2">
+        <Progress value={displayValue} className="h-1 [&>[data-slot=progress-indicator]]:duration-1000 [&>[data-slot=progress-indicator]]:ease-out" />
+        <div className="flex">
+          {QUESTIONS.map((q) => (
+            <div key={q.id} className="flex-1 text-center">
+              <span
+                className={cn(
+                  "text-[10px] font-mono whitespace-nowrap transition-colors duration-300",
+                  answers[q.id]?.trim() ? "text-foreground/60" : "text-foreground/25",
+                )}
+              >
+                {q.section}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Scorecard View ───────────────────────────────────────────────────────────
 
 type ScorecardViewProps = {
@@ -689,34 +723,9 @@ function ScorecardView({
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             Project Clarity
           </p>
-          <div className="flex flex-col gap-3">
-          <p className="text-4xl font-semibold tracking-tight">{stage.label}</p>
-          {/* Stage track */}
-          <div className="flex items-center gap-1 flex-wrap">
-            {STAGES.map((s, i) => {
-              const isCurrent = s.label === stage.label
-              const isPast = s.threshold <= stage.threshold
-              return (
-                <React.Fragment key={s.label}>
-                  <span
-                    className={cn(
-                      "text-xs font-mono transition-colors duration-300",
-                      isCurrent
-                        ? "text-foreground font-medium"
-                        : isPast
-                        ? "text-foreground/40"
-                        : "text-foreground/20",
-                    )}
-                  >
-                    {s.label}
-                  </span>
-                  {i < STAGES.length - 1 && (
-                    <span className="text-foreground/15 text-xs font-mono">—</span>
-                  )}
-                </React.Fragment>
-              )
-            })}
-          </div>
+          <div className="flex flex-col gap-4">
+            <p className="text-4xl tracking-tight" style={{ fontFamily: "'Newsreader', serif" }}>{stage.label}</p>
+            <ProgressStepper answers={answers} progress={progress} />
           </div>
         </div>
 
