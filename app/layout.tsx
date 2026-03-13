@@ -16,8 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clarity Sprint",
-  description: "Define project scope before a sprint begins. Go from chaos to clarity.",
+  title: "Clarity",
+  description: "Define your project before you build. Go from chaos to clarity in minutes.",
+  openGraph: {
+    title: "Clarity",
+    description: "Define your project before you build. Go from chaos to clarity in minutes.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Clarity",
+    description: "Define your project before you build. Go from chaos to clarity in minutes.",
+  },
 };
 
 export default function RootLayout({
