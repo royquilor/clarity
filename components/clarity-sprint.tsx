@@ -13,6 +13,7 @@ import {
   Mail01Icon,
 } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
+import { ClaritySymbol } from "@/components/clarity-symbol"
 import { track } from "@vercel/analytics"
 import { motion } from "framer-motion"
 import {
@@ -378,69 +379,7 @@ function MadeBy() {
   )
 }
 
-// ─── Clarity Symbol ───────────────────────────────────────────────────────────
-
-function ClaritySymbol({ isBlurring, step = 0 }: { isBlurring: boolean; step?: number }) {
-  const r = 6
-  const circumference = 2 * Math.PI * r
-  const filledSegments = step // 0–5 completed phases
-  const dashArray = (filledSegments / 6) * circumference
-
-  return (
-    <motion.svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      className="shrink-0 mt-1.5"
-      animate={
-        isBlurring
-          ? {
-              filter: [
-                "blur(0px)",
-                "blur(3.5px)",
-                "blur(0.5px)",
-                "blur(3.5px)",
-                "blur(0px)",
-              ],
-              opacity: [1, 0.5, 0.8, 0.5, 1],
-            }
-          : { filter: "blur(0px)", opacity: 1 }
-      }
-      transition={
-        isBlurring
-          ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
-          : { duration: 0.4 }
-      }
-    >
-      {/* Track */}
-      <circle
-        cx="8"
-        cy="8"
-        r={r}
-        stroke="#FFAA80"
-        strokeWidth="1.5"
-        opacity={0.35}
-      />
-      {/* Progress arc — starts at top (−90°) */}
-      <motion.circle
-        cx="8"
-        cy="8"
-        r={r}
-        stroke="#FF6B35"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        className="text-foreground"
-        fill="none"
-        strokeDasharray={circumference}
-        strokeDashoffset={circumference}
-        transform="rotate(-90 8 8)"
-        animate={{ strokeDashoffset: circumference - dashArray }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      />
-    </motion.svg>
-  )
-}
+// ─── Clarity Symbol ─────────────────────────── imported from clarity-symbol.tsx
 
 // ─── Ticker Text ──────────────────────────────────────────────────────────────
 

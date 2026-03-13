@@ -18,7 +18,7 @@ function toColorEntries(colors: string[]): ColorEntry[] {
 }
 
 export function GrainGradientBg({ showControls = false }: { showControls?: boolean }) {
-  const [shape, setShape] = useState<GrainGradientShape>("sphere");
+  const [shape, setShape] = useState<GrainGradientShape>("ripple");
   const [speed, setSpeed] = useState(defaultParams.speed ?? 1);
   const [softness, setSoftness] = useState(0.8);
   const [intensity, setIntensity] = useState(0.9);
