@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Agentation } from "agentation";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,9 +42,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
+          <TooltipProvider>
           {children}
           <Analytics />
           {process.env.NODE_ENV === "development" && <Agentation />}
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

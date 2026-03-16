@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowLeft01Icon,
@@ -848,19 +849,34 @@ function ScorecardView({
               data-icon="inline-start"
 
             />
-            {copied ? "Copied" : "Copy Markdown"}
+            {copied ? "Copied" : "Copy"}
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onReset} aria-label="New Sprint">
-            <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} />
-          </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
-            <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
-          </Button>
-          <Button variant="ghost" size="icon-sm" aria-label="Subscribe" asChild onClick={() => track("clarity_subscribe_click")}>
-            <a href="https://enter404.com?utm_source=clarity&utm_medium=tool" target="_blank" rel="noopener noreferrer">
-              <HugeiconsIcon icon={Mail01Icon} strokeWidth={2} />
-            </a>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon-sm" onClick={onReset} aria-label="New Sprint">
+                <HugeiconsIcon icon={RotateClockwiseIcon} strokeWidth={2} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>New Sprint</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon-sm" onClick={onDownload} aria-label="Download .md file">
+                <HugeiconsIcon icon={Download01Icon} strokeWidth={2} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Download .md</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon-sm" aria-label="Subscribe" asChild onClick={() => track("clarity_subscribe_click")}>
+                <a href="https://enter404.com?utm_source=clarity&utm_medium=tool" target="_blank" rel="noopener noreferrer">
+                  <HugeiconsIcon icon={Mail01Icon} strokeWidth={2} />
+                </a>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Subscribe</TooltipContent>
+          </Tooltip>
         </div>
       </div>
       </div>
