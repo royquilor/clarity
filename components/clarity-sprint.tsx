@@ -648,9 +648,9 @@ function QuestionView({
                 Analyzing…
               </>
             ) : transitionMessage ? (
-              isLast ? "Finish" : "Next"
+              <>{isLast ? "Finish" : "Next"} <span className="opacity-50">⌘↵</span></>
             ) : (
-              "Analyze"
+              <>Analyze <span className="opacity-50">⌘↵</span></>
             )}
           </Button>
         </div>
