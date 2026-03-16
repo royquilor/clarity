@@ -846,7 +846,7 @@ function ScorecardView({
               icon={copied ? CheckmarkCircle01Icon : Copy01Icon}
               strokeWidth={2}
               data-icon="inline-start"
-              className={cn(copied && "text-foreground")}
+
             />
             {copied ? "Copied" : "Copy Markdown"}
           </Button>
