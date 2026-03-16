@@ -539,8 +539,7 @@ function QuestionView({
         )}
 
         <div
-          className="flex flex-col divide-y divide-border/50 transition-opacity duration-200"
-          style={{ opacity: isReflecting || transitionMessage ? 0 : 1 }}
+          className="flex flex-col divide-y divide-border/50"
         >
           {/* Suggestion 1 */}
           <button
@@ -548,10 +547,13 @@ function QuestionView({
             onClick={() => handleSuggestionClick(suggestions[0])}
             disabled={isReflecting || !!transitionMessage}
             className={cn(
-              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150 disabled:pointer-events-none",
+              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-[colors,opacity] duration-200 disabled:pointer-events-none",
               getOptionClass(answer === suggestions[0]),
             )}
-            style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
+            style={{
+              fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)",
+              opacity: (isReflecting || transitionMessage) ? (answer === suggestions[0] ? 0.4 : 0) : 1,
+            }}
           >
             {suggestions[0]}
           </button>
@@ -562,16 +564,24 @@ function QuestionView({
             onClick={() => handleSuggestionClick(suggestions[1])}
             disabled={isReflecting || !!transitionMessage}
             className={cn(
-              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-colors duration-150 disabled:pointer-events-none",
+              "w-full text-left py-5 font-medium leading-snug tracking-tight transition-[colors,opacity] duration-200 disabled:pointer-events-none",
               getOptionClass(answer === suggestions[1]),
             )}
-            style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)" }}
+            style={{
+              fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)",
+              opacity: (isReflecting || transitionMessage) ? (answer === suggestions[1] ? 0.4 : 0) : 1,
+            }}
           >
             {suggestions[1]}
           </button>
 
           {/* Free text option */}
-          <div className="py-5">
+          <div
+            className="py-5 transition-opacity duration-200"
+            style={{
+              opacity: (isReflecting || transitionMessage) ? (!isSuggestionSelected && answer ? 0.4 : 0) : 1,
+            }}
+          >
             <textarea
               ref={textareaRef}
               value={isSuggestionSelected ? "" : answer}
