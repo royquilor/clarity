@@ -25,6 +25,7 @@ import {
   AvatarFallback,
   AvatarGroup,
 } from "@/components/ui/avatar"
+import { ModelSelector } from "@/components/model-selector"
 
 type Source = { name: string; initials: string; url: string }
 
@@ -328,10 +329,11 @@ export function ClaritySprint() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <div className="fixed top-0 left-0 z-10 px-6 pt-5 pb-3">
+      <div className="fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-6 pt-5 pb-3">
         <Link href="/" aria-label="Back to home">
           <ClaritySymbol size={18} step={answeredCount} isBlurring={isReflecting || !!transitionMessage} />
         </Link>
+        <ModelSelector />
       </div>
 
       {/* Main */}
