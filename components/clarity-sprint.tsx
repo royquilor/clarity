@@ -751,7 +751,7 @@ function ScorecardView({
                   <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-foreground/30">
                     <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2" />
                   </svg>
-                  <span className="text-sm font-mono text-foreground/40">{q.section}</span>
+                  <span className="text-sm text-foreground/40">{q.section}</span>
                 </li>
               ))}
             </ul>
@@ -766,7 +766,7 @@ function ScorecardView({
             </p>
             {isAnalyzing && !aiInsight ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-foreground/30 font-mono animate-pulse">Analyzing…</span>
+                <span className="text-sm text-foreground/30 animate-pulse">Analyzing…</span>
               </div>
             ) : (
               <p className="text-sm text-foreground/70 leading-relaxed">{aiInsight}</p>
@@ -783,7 +783,7 @@ function ScorecardView({
             <p className="text-sm text-foreground/70">Before starting the sprint, clarify:</p>
             <ul className="flex flex-col gap-1.5">
               {gaps.map((q) => (
-                <li key={q.id} className="text-sm font-mono text-foreground/60 flex items-center gap-2">
+                <li key={q.id} className="text-sm text-foreground/60 flex items-center gap-2">
                   <span className="text-foreground/30">·</span>
                   {q.section}
                 </li>
@@ -798,7 +798,7 @@ function ScorecardView({
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               Status
             </p>
-            <p className="text-sm text-foreground/60 font-mono">
+            <p className="text-sm text-foreground/60">
               All areas defined. Ready for sprint.
             </p>
           </div>
@@ -809,7 +809,7 @@ function ScorecardView({
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             Clarity Report Complete
           </p>
-          <p className="text-sm text-foreground/40 leading-relaxed">
+          <p className="text-sm text-foreground/60 leading-relaxed">
             This analysis was generated using Clarity.<br />
             Clarity is part of Enter404 — tools for designers navigating the AI era.
           </p>
