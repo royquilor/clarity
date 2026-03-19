@@ -745,7 +745,7 @@ function ScorecardView({
             Project Clarity
           </p>
           <div className="flex flex-col gap-4">
-            <p className="text-4xl tracking-tight" style={{ fontFamily: "'Newsreader', serif" }}>{stage.label}</p>
+            <p className="font-serif text-4xl leading-[1.15] tracking-tight">{stage.label}</p>
             <ProgressStepper answers={answers} progress={progress} />
           </div>
         </div>

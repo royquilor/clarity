@@ -93,7 +93,7 @@ export function HeroSection() {
             }}
             className="flex flex-col gap-5"
           >
-            <p className="text-4xl tracking-tight text-balance" style={{ fontFamily: "'Newsreader', serif" }}>
+            <p className="font-serif text-4xl leading-[1.15] tracking-tight text-balance">
               {current.stat}
             </p>
             <a
